@@ -1,0 +1,19 @@
+{{ if or (eq .Values.postgres.cnpgCluster "false") (eq .Values.postgres.cnpgMigration "true") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.project_name }}-postgres
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+spec:
+  type: ClusterIP
+  ports:
+   - name: {{ .Values.global.project_name }}-postgres-listener
+     port: 5432
+     targetPort: 5432
+  selector:
+   app: {{ .Values.global.project_name }}-postgres
+status:
+  loadBalancer: {}
+{{ end }}

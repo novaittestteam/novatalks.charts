@@ -1,0 +1,269 @@
+# Default values for NovaTalks
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Overrides the image tag whose default is the chart appVersion.
+
+global:
+  #Versions
+  ver_ui: &tag_ui 2023_R2_master_1f2135fd
+  ver_engine: &tag_engine 2023_R2_master_28e82350
+  ver_botflow: &tag_botflow 2023_R2_master_f37ce65a
+  #Must be changed in all config below, like a db-host, redis-host
+  project_name: &project_name ntk-dev-novait
+  #Namespace
+  customer_name: &customer_name dev-novait
+  #DB Connection settings
+  customer_fqdn: "novait.k3s.dev.novait.com.ua"
+  customer_fqdn_int: "novait.k3s.dev.novait.local"
+  db_host: &db_host ntk-dev-novait-postgres
+  #db_host: &db_host ntk-dev-novait-postgres-cluster-rw #In case of CloudNativePG
+  db_name: &db_name ntk-dev-novait-novatalks
+  db_user: &db_user ntk-dev-novait-novatalks-svc
+  redis_host: &redis_host ntk-dev-novait-redis
+  redis_port: &redis_port 6379
+  
+  #Storage Settings
+  datastore:
+    static:           #Content Sharing PVC
+      is_set: "true" #Simple Local-Path PVC. Uses an old PVC "*-static-pvc". For Engine files
+      type: longhorn
+      size: 5Gi
+    postgres:
+      is_set: "true"
+      type: longhorn
+      size: 5Gi
+      access: ReadWriteOnce
+    postgresCluster:  #Will be created automatically when cnpgCluster is "true", BUT don't create any PVC/PV (they wil be created dynamically)
+      type: longhorn-strict
+      size: 5Gi
+      access: ReadWriteOnce
+    redis:
+      is_set: "true"
+      type: longhorn
+      size: 64Mi
+      access: ReadWriteOnce
+    botflow:
+      is_set: "true"
+      type: longhorn
+      size: 512Mi
+      access: ReadWriteOnce
+
+    #ReadWriteMany Storages (Deprecated)
+    storage:          
+      is_set: "false"  
+      type: local-path  #If the PVC already exists then put value of GB of this storage
+      size: 10Gi
+    distributed:      #Longhorn PVC. For PSQL, Redis, Botflow.
+      is_set: "false"  #If this Turned OFF > Works old Logic.
+      type: local-path
+      size: 10Gi
+
+  #Helm installation will  compare only the values (nodes) and their qty. As matched nodes exists as that qty will be in affinty.
+  
+  nodeBind:
+    prefered: dev-01-k3sa01d.dev.novait.local
+    #alter: dev-01-k3sa02d.dev.novait.local
+  nodeBindPostgresCluster:
+    prefered: dev-01-k3sa01d.dev.novait.local
+    alter: dev-01-k3sa02d.dev.novait.local
+
+ui:
+  replica: 1
+  image: ghcr.io/novaitdevteam/novatalks.ui
+  tag: *tag_ui
+  containerPort: 8000
+  servicePort: 8000
+  sizing: small
+  resources:
+    small:
+      cpu: 25m
+      memory: 128Mi
+    medium:
+      cpu: 30m
+      memory: 128Mi
+    large:
+      cpu: 50m
+      memory: 128Mi
+engine:
+  replica: 1
+  image: ghcr.io/novaitdevteam/novatalks.engine
+  tag: *tag_engine
+  containerPort: 3000
+  servicePort: 3000
+  sizing: small
+  resources:
+    small:
+      cpu: 250m
+      memory: 512Mi
+    medium:
+      cpu: 500m
+      memory: 1024Mi
+    large:
+      cpu: 1000m #better 1200m related to case NC2-564
+      memory: 2048Mi
+botflow:
+  replica: 1
+  image: ghcr.io/novaitdevteam/nova.botflow
+  tag: *tag_botflow
+  containerPort: 1880
+  servicePort: 1880
+  sizing: small
+  resources:
+    small:
+      cpu: 75m
+      memory: 384Mi
+    medium:
+      cpu: 120m
+      memory: 512Mi
+    large:
+      cpu: 300m
+      memory: 768Mi
+postgres:
+  replica: 1
+  sizing: small
+  resources:
+    small:
+      cpu: 150m
+      memory: 512Mi
+    medium:
+      cpu: 300m
+      memory: 1256Mi
+    large:
+      cpu: 650m
+      memory: 2048Mi
+  cnpgCluster: "true"
+  cnpgMigration: "true" #Only for initial data migration in deployed installations. It turns on simple Postgres and CNPG Cluster.
+  cnpgClusterImage: ghcr.io/cloudnative-pg/postgresql:15.2
+  cnpgClusterReplica: 1
+  cnpgClusterBackupPath: "s3://dev-01-dev-longhorn-backup-bucket/"
+  #cnpgClusterBackupPath: "s3://ntk-prod-db-backup-bucket/" #for Prod
+  cnpgClusterParameters: #Small Configuration, must be tuned according to sizing
+    max_connections: 50
+    shared_buffers: 128MB
+    effective_cache_size: 384MB
+    maintenance_work_mem: 32MB
+    checkpoint_completion_target: 0.9
+    wal_buffers: 3932kB
+    default_statistics_target: 100
+    random_page_cost: 1.1
+    effective_io_concurrency: 200
+    min_wal_size: 1GB
+    max_wal_size: 2GB
+    work_mem: 1310kB
+    pg_stat_statements.max: 10000
+    pg_stat_statements.track: all
+    auto_explain.log_min_duration: 10s
+    archive_timeout: 300 #in sec for WAL shipping      
+redis:
+  replica: 1
+  sizing: small
+  resources:
+    small:
+      cpu: 20m
+      memory: 96Mi
+    medium:
+      cpu: 30m
+      memory: 96Mi
+    large:
+      cpu: 50m
+      memory: 128Mi
+
+env:
+
+  ################NOVA BOTFLOW################
+
+  BF_NODE_RED_CREDENTIAL_SECRET: "N0v@ITLLC"
+  BF_MESSAGE_ID_PREFIX: "ntid"
+  BF_MESSAGE_ID_EX_TIME: "604800"
+
+  #Scaling configuration
+  BF_MULTINODE_SYNC: "false"
+  BF_CONFIG_STORAGE_TYPE: "redis" #redis, filesystem by default
+  BF_REDIS_HOST: *redis_host
+  BF_REDIS_PORT: *redis_port
+  BF_REDIS_DB: 15
+  #BF_REDIS_PASSWORD: ""
+
+  ################NOVATALKS UI################
+  
+  UI_SERVER_PORT: "8000"
+  UI_SERVER_HOST: "0.0.0.0"
+
+  UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-engine:3000"
+  UI_IMPORT_CONTACTS: "true"
+  UI_DELETE_CONTACT: "true"
+  UI_WEBSOCKET_URL: "https://novait.k3s.dev.novait.com.ua"
+  UI_PRESENCE_INTERVAL: "10000"
+  UI_REFRESH_REPORT_INTERVAL: "30000"
+  UI_MESSAGE_DYNAMIC_TIME: "true"
+  UI_VAPID_PUBLIC_KEY: "BIcMy5toEHOHrf86mFrGFCq-jC8WjX4KHZ0En4OTSb-oCiySUxI_VlT9pYqJrY_c7Ia-LPeoDTYOpnLDdYFQaNQ"
+  UI_VUE_PRODUCTION_TIP: "false"
+  UI_VUE_DEVTOOLS: "false"
+  
+  UI_NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
+  ################NOVATALKS ENGINE################
+  ENGINE_UV_THREADPOOL_SIZE: "32"
+
+  # APPLICATION CONFIG
+  ENGINE_NODE_ENV: "production" 
+  ENGINE_APP_HOST: "0.0.0.0"
+  ENGINE_APP_PORT: "3000"
+  ENGINE_FRONTEND_URL: "https://novait.k3s.dev.novait.com.ua" #User's notifications Base URL
+  ENGINE_WIDGET_URL: "https://storage.novatalks.ai/static/widget/v1"
+  ENGINE_STORE_URL: "https://novait.k3s.dev.novait.com.ua" #Get Attachement and Avatars from Core
+  ENGINE_SWAGGER_STATS_ENABLE: "true"
+  ENGINE_LOG_LEVEL: "debug"
+  ENGINE_THROTTLE_ENABLE: "true"
+  #the ttl, the time to live in seconds for the request tracker, and the limit, or how many times an endpoint can be hit before returning a 429
+  ENGINE_THROTTLE_TTL: "60"
+  ENGINE_THROTTLE_LIMIT: "100"
+  ENGINE_AUTH_LOGOUT_TIMEOUT: "30000"
+  #File extensions that are ALLOWED for Transferring
+  #Most complete extesions list: .aac,.amr,.bmp,.cdr,.csv,.doc,.DOC,.docx,.gif,.heic,.HEIC,.html,.ini,.jfif,.jks,.jpeg,.jpg,.m4a,.mht,.mkv,.mov,.mp3,.mp4,.MP4,.msg,.oga,.pdf,.PDF,.png,.PNG,.pptx,.rar,.rtf,.txt,.vptt,.webm,.webp,.xls,.xlsx,.XLSX,.xml,.zip
+  ENGINE_FILE_SUPPORTED_FILE_EXTENSIONS: ".oga,.MP4,.aac,.bmp,.csv,.doc,.docx,.gif,.ico,.jpeg,.jpg,.json,.k3s,.mp4,.ogg,.pdf,.png,.pptx,.rar,.rtf,.svg,.txt,.webm,.wmv,.xml,.zip"
+  ENGINE_MESSAGE_STATUS_INTERVAL: "5000"
+  ENGINE_HISTORY_REPORT_ROWS: "5000"
+
+  # DATABASE CONFIG
+  ENGINE_DATABASE_DIALECT: "postgres"
+  ENGINE_DATABASE_HOST: *db_host
+  ENGINE_DATABASE_PORT: "5432"
+  ENGINE_DATABASE_USERNAME: *db_user
+  ENGINE_DATABASE_NAME: *db_name
+
+  # REDIS CONFIG
+  ENGINE_REDIS_HOST: *redis_host
+  ENGINE_REDIS_PORT: *redis_port
+  ENGINE_REDIS_DB: "0"
+
+  # MAIL CONFIG
+  ENGINE_MAIL_HOST: "maildev"
+  ENGINE_MAIL_PORT: "1025"
+  ENGINE_MAIL_USER: ""
+  ENGINE_MAIL_PASSWORD: ""
+  ENGINE_MAIL_IGNORE_TLS: "true"
+  ENGINE_MAIL_SECURE: "false"
+  ENGINE_MAIL_REQUIRE_TLS: "false"
+  ENGINE_MAIL_DEFAULT_EMAIL: "noreply@example.com"
+  ENGINE_MAIL_DEFAULT_NAME: "Api"
+  ENGINE_MAIL_CLIENT_PORT: "1080"
+
+  ENGINE_AUTH_ACTIVE_PROVIDERS: "email,ldap"
+  ENGINE_AUTH_JWT_SECRET: "nLxbUR3v5932CJz9"
+  ENGINE_AUTH_JWT_TOKEN_EXPIRES_IN: "7d"
+  ENGINE_PASSPORT_USERNAME_FIELD: ""
+  ENGINE_PASSPORT_PASSWORD_FIELD: ""
+
+
+  # LDAP CONFIG
+  ENGINE_LDAP_URL: "ldaps://nit-90-dc01.novait.local:636"
+  ENGINE_LDAP_BIND_DN: "CN=novachats2-standalone-demo ldap service,OU=Services,OU=NovaIT LLC,DC=novait,DC=local"
+  ENGINE_LDAP_BIND_CREDENTIALS: "mWQ8UrPBducMRJhHyAY3yhqE"
+  ENGINE_LDAP_SEARCH_BASE: "DC=novait,DC=local"
+  ENGINE_LDAP_SEARCH_FILTER: "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(userPrincipalName={{username}}))"
+  ENGINE_LDAP_SEARCH_ATTRIBUTES: ""
+  ENGINE_LDAP_CA_CERTIFICATE: ""
+  ENGINE_LDAP_IGNORE_CERTIFICATE: "true"
+
+  ################NOVA BOTFLOW################

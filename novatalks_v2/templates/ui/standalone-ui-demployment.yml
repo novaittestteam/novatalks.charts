@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-ui
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-ui
+spec:
+  replicas: {{ int .Values.ui.replica }}
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-ui
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.project_name }}-ui
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers:
+      - name: {{ .Values.global.project_name }}-ui
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-ui-config
+        image: {{ .Values.ui.image }}:{{ .Values.ui.tag }}
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.ui.resources $.Values.ui.sizing ) }}
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: {{ int .Values.ui.containerPort }}
+      restartPolicy: Always
+status: {}

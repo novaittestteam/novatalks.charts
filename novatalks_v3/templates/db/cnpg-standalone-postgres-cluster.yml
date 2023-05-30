@@ -1,0 +1,94 @@
+{{ if eq .Values.postgres.cnpgCluster "true" }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.global.project_name }}-postgres-cluster
+  namespace: {{ .Values.global.customer_name }}
+spec:
+  imageName: {{ .Values.postgres.cnpgClusterImage }}
+  imagePullPolicy: IfNotPresent
+  instances: {{ int .Values.postgres.cnpgClusterReplica }}
+  primaryUpdateStrategy: unsupervised
+  primaryUpdateMethod: switchover
+  postgresql:
+    parameters: 
+      {{- range $param, $value := .Values.postgres.cnpgClusterParameters }}
+      {{ $param }}: {{ tpl ($value | quote) $ }}
+      {{- end }}
+  storage:
+    pvcTemplate:
+      storageClassName: {{ .Values.global.datastore.postgresCluster.type }}
+      volumeMode: Filesystem
+      accessModes:
+        - {{ .Values.global.datastore.postgresCluster.access }}
+      resources:
+        requests:
+          storage: {{ .Values.global.datastore.postgresCluster.size }}
+  # walStorage:
+  #   pvcTemplate:
+  #     storageClassName: {{ .Values.global.datastore.postgresCluster.type }}
+  #     volumeMode: Filesystem
+  #     accessModes:
+  #       - {{ .Values.global.datastore.postgresCluster.access }}
+  #     resources:
+  #       requests:
+  #         storage: 5Gi
+  backup:
+    target: "primary"
+    barmanObjectStore:
+      destinationPath: {{ .Values.postgres.cnpgClusterBackupPath }}
+      endpointURL: "https://minio-ntk-prod-tenant.nsm.novait.local"
+      endpointCA: 
+        name: {{ .Values.global.project_name }}-s3-secret
+        key: cabundle
+      s3Credentials:
+        accessKeyId:
+          name: {{ .Values.global.project_name }}-s3-secret
+          key: secretAccessKeyID
+        secretAccessKey:
+          name: {{ .Values.global.project_name }}-s3-secret
+          key: secretAccessKey
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+        jobs: 4
+    retentionPolicy: "7d"
+  bootstrap:
+    initdb:
+      database: {{ .Values.global.db_name }}
+      owner: {{ .Values.global.db_user }}
+      secret:
+        name: {{ .Values.global.project_name }}-postgres-secret
+      postInitSQL:
+        - "ALTER USER \"{{ .Values.global.db_user }}\" createdb;"
+  affinity:
+    nodeAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+       nodeSelectorTerms:
+         - matchExpressions:
+             - key: kubernetes.io/hostname
+               operator: In
+               values:
+               {{- include "getNodesPGCluster" ( list $.Values.global.nodeBindPostgresCluster ) }}
+  resources:
+    limits:
+    {{- include "getSizingResources"  ( list $.Values.postgres.resources $.Values.postgres.sizing ) }}
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+
+---
+
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ .Values.global.project_name }}-postgres-backup
+  namespace: {{ .Values.global.customer_name }}
+spec:
+  schedule: "0 15 2 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: {{ .Values.global.project_name }}-postgres-cluster
+
+{{ end }}

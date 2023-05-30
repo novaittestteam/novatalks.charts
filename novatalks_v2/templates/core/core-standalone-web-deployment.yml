@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-core-web
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-core-web
+spec:
+  replicas: {{ int .Values.web.replica }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-core-web
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.global.project_name }}-core-web
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers: 
+      # - args:
+      #   - bundle
+      #   - exec
+      #   - rails
+      #   - s
+      #   - -p
+      #   - "3000"
+      #   - -b
+      #   - 0.0.0.0
+      #   command:
+      #   - docker/entrypoints/rails.sh
+      - name: {{ .Values.global.project_name }}-core-web
+        image: {{ .Values.web.image }}:{{ .Values.web.tag }}
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.web.resources $.Values.web.sizing ) }}
+          requests:
+            memory: "384Mi"
+            cpu: "100m"
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-config
+        ports:
+        - containerPort: {{ int .Values.web.containerPort }}
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-core-web-data
+          mountPath: /app/storage
+          subPath: coredata
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.global.project_name }}-core-web-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.project_name }}-storage-pvc
+status: {}

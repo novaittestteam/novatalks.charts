@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-ui-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-ui
+data:
+  SERVER_PORT: "{{ .Values.env.UI_SERVER_PORT }}"
+  SERVER_HOST: "{{ .Values.env.UI_SERVER_HOST }}"
+  NOVA_CHATS_ENGINE_HOST: "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST }}"
+  RUBY_HOST: "{{ .Values.env.UI_RUBY_HOST }}"
+  GENESYS_HOST: "{{ .Values.env.UI_GENESYS_HOST }}"
+  NODE_TLS_REJECT_UNAUTHORIZED: "{{ .Values.env.UI_NODE_TLS_REJECT_UNAUTHORIZED }}"
+  LOGOUT_TIMEOUT_OFFLINE: "{{ .Values.env.UI_LOGOUT_TIMEOUT_OFFLINE }}"
+  WIDGET_SOURCE_HOST: "{{ .Values.env.UI_WIDGET_SOURCE_HOST }}"

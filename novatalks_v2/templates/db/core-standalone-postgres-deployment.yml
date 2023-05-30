@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-postgres
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.project_name }}-postgres
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers:
+      - name: {{ .Values.global.project_name }}-postgres
+        image: postgres:12
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 5432
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.postgres.resources $.Values.postgres.sizing ) }}
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.global.project_name }}-postgres-config
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: {{ .Values.global.project_name }}-postgresdb
+            subPath: ./db/postgres
+      volumes:
+        - name: {{ .Values.global.project_name }}-postgresdb
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-storage-pvc

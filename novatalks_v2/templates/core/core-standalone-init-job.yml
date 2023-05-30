@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.project_name }}-init-db
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-init-db
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: init-postgres
+        image: postgres:12
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+            PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+            until $PG_READY;
+            do
+              sleep 2;
+            done;
+            echo "Database ready to accept connections."  ;
+      - name: init-redis
+        image: busybox:1.28
+        command: ["sh", "-c", "until nslookup {{ .Values.global.redis_host }} ; do echo waiting for {{ .Values.global.redis_port }} ; sleep 2; done;"]     
+      containers:
+      - name: "db-create-job"
+        image: "{{ .Values.web.image }}:{{ .Values.web.tag }}"
+        args:
+        - bundle
+        - exec
+        - rails
+        - db:chatwoot_prepare
+        command:
+        - docker/entrypoints/rails.sh
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-config

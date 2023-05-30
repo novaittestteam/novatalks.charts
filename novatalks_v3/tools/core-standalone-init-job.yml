@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.project_name }}-init-db
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-init-db
+spec:
+  parallelism: 1
+  completions: 1
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: init-postgres
+        image: postgres:12
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+            PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+            until $PG_READY;
+            do
+              sleep 2;
+            done;
+            echo "Database ready to accept connections."  ;
+      - name: init-redis
+        image: busybox:1.28
+        command: ["sh", "-c", "until nslookup {{ .Values.global.redis_host }} ; do echo waiting for {{ .Values.global.redis_port }} ; sleep 2; done;"]     
+      - name: "db-create-job"
+        image: "{{ .Values.engine.image }}:{{ .Values.engine.tag }}"
+        args:
+        - db:migrate
+        command:
+        - yarn
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-engine-config
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-db-script
+          mountPath: /opt/nova.chats.engine/src/database/config.js
+          subPath: "config.js"
+      containers:
+      - name: "db-seed-job"
+        image: "{{ .Values.engine.image }}:{{ .Values.engine.tag }}"
+        args:
+        - db:seed:prod
+        command:
+        - yarn
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-engine-config
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-db-script
+          mountPath: /opt/nova.chats.engine/src/database/config.js
+          subPath: "config.js"
+      volumes:
+      - name: {{ .Values.global.project_name }}-db-script
+        configMap:
+          name: {{ .Values.global.project_name }}-db-config

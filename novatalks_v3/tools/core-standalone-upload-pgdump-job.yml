@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.global.project_name }}-backup-postgres-aws-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-backup-postgres-job
+type: Opaque
+data:
+  AWS_DEFAULT_REGION: dXMtZWFzdC0x
+  AWS_ACCESS_KEY_ID: bnRrLXByb2QtZGItYmFja3Vw
+  AWS_SECRET_ACCESS_KEY: M3g4VzZxOVlnMHdHM2ZVWFo3VkhVUFFOY3puRnNrbno=
+stringData:
+  ENDPOINT_URL: "--endpoint-url https://minio-ntk-prod-tenant.nsm.novait.local"
+  VERIFY_SSL: "--no-verify-ssl"
+  BUCKET: "s3://ntk-prod-db-backup-bucket"
+
+---
+
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-backup-postgres-job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-backup-postgres-job
+spec:
+  schedule: "30 4 * * *"
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: init-postgres
+            {{ if eq .Values.postgres.cnpgCluster "true" }}
+            image: {{ .Values.postgres.cnpgClusterImage }}
+            {{ else }}
+            image: postgres:12
+            {{ end }}
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          - name: "dump-and-upload-job"
+            {{ if eq .Values.postgres.cnpgCluster "true" }}
+            image: {{ .Values.postgres.cnpgClusterImage }}
+            {{ else }}
+            image: postgres:12
+            {{ end }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - >-
+                echo "Starting Backup..";
+                mkdir -p /tmp/pgdump/{{ .Values.global.project_name }}/$(date +%Y-%m-%d)/postgres/;
+                export PGPASSWORD={{ $cred.secrets.db.pass }};
+                pg_dump -Fc -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -v > /tmp/pgdump/{{ .Values.global.project_name }}/$(date +%Y-%m-%d)/postgres/{{ .Values.global.project_name }}_${POSTGRES_DB}_$(date +%Y-%m-%dT%H:%M:%S).gz;          
+                if [ $? -eq 0 ];
+                then
+                  echo "Backup Completed";            
+                  exit 0;
+                else
+                  echo "PGdump failed";
+                  exit 1;
+                fi; 
+            envFrom:
+            - configMapRef: 
+                name: {{ .Values.global.project_name }}-postgres-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-shared-data
+              mountPath: /tmp
+          containers:
+          - name: "aws-cli"
+            image: amazon/aws-cli:latest
+            imagePullPolicy: Always
+            command: ["/bin/sh","-c"]
+            args:
+              - >-
+                aws $ENDPOINT_URL $VERIFY_SSL s3 ls &&
+                aws $ENDPOINT_URL $VERIFY_SSL s3 cp /tmp/pgdump/ $BUCKET --recursive
+            envFrom:
+            - secretRef:
+                name: {{ .Values.global.project_name }}-backup-postgres-aws-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-shared-data
+              mountPath: /tmp
+          volumes:
+          - name: {{ .Values.global.project_name }}-shared-data
+            emptyDir: {}

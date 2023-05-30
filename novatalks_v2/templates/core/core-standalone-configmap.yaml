@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-config
+data:
+#--------
+  NODE_ENV: production
+  RAILS_ENV: production
+  FRONTEND_URL: {{ .Values.web.frontendUrl }}
+  INSTALLATION_ENV: helm
+#--------
+  ACTIVE_STORAGE_SERVICE: local
+  ANDROID_BUNDLE_ID: com.novatalks.app
+  ANDROID_SHA256_CERT_FINGERPRINT: AC:73:8E:DE:EB:56:EA:CC:10:87:02:A7:65:37:7B:38:D4:5D:D4:53:F8:3B:FB:D3:C6:28:64:1D:AA:08:1E:D8
+  ASSET_CDN_HOST: ""
+  AWS_ACCESS_KEY_ID: ""
+  AWS_REGION: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  ENABLE_ACCOUNT_SIGNUP: "false"
+  ENABLE_PUSH_RELAY_SERVER: "true"
+  FB_APP_ID: ""
+  FB_APP_SECRET: ""
+  FB_VERIFY_TOKEN: ""
+  FORCE_SSL: "false"
+  IG_VERIFY_TOKEN: ""
+  IOS_APP_ID: L7YLMN4634.com.novatalks.app
+  LOG_LEVEL: info
+  LOG_SIZE: "500"
+  MAILER_INBOUND_EMAIL_DOMAIN: ""
+  MAILER_SENDER_EMAIL: NovaIT <support@novatalks.ai>
+  MAILGUN_INGRESS_SIGNING_KEY: ""
+  MANDRILL_INGRESS_API_KEY: ""
+  POSTGRES_DATABASE: {{ .Values.global.db_name }}
+  POSTGRES_HOST: {{ .Values.global.db_host }}
+  POSTGRES_USERNAME: {{ .Values.global.db_user }}
+  RAILS_INBOUND_EMAIL_PASSWORD: ""
+  RAILS_INBOUND_EMAIL_SERVICE: ""
+  RAILS_LOG_TO_STDOUT: "true"
+  RAILS_MAX_THREADS: "5"
+  REDIS_SENTINEL_MASTER_NAME: ""
+  REDIS_SENTINELS: ""
+  REDIS_URL: redis://{{ .Values.global.redis_host }}:{{ .Values.global.redis_port }}
+  S3_BUCKET_NAME: ""
+  SECRET_KEY_BASE: {{ .Values.web.secretKeyBase }}
+  SLACK_CLIENT_ID: ""
+  SLACK_CLIENT_SECRET: ""
+  SMTP_ADDRESS: mailhog
+  SMTP_AUTHENTICATION: ""
+  SMTP_DOMAIN: novatalks.ai
+  SMTP_ENABLE_STARTTLS_AUTO: "true"
+  SMTP_OPENSSL_VERIFY_MODE: peer
+  SMTP_PASSWORD: ""
+  SMTP_PORT: "1025"
+  SMTP_USERNAME: ""
+  TWITTER_APP_ID: ""
+  TWITTER_CONSUMER_KEY: ""
+  TWITTER_CONSUMER_SECRET: ""
+  TWITTER_ENVIRONMENT: ""
+  USE_INBOX_AVATAR_FOR_BOT: "true"
+{{ .Files.Get "config/auth_core" | indent 2 }}

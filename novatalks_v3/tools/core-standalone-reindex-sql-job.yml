@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-sql-reindex-query
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-sql-reindex-query
+data:
+  reindex-biggest-tables.sql: |
+    SELECT current_database();
+    REINDEX (VERBOSE) TABLE CONCURRENTLY contacts;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY contact_inboxes;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY conversations;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY notifications;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY storage_attachments;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY storage_blobs;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY messages;
+
+---    
+
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-maintenance-reindex--job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-maintenance-reindex--job
+spec:
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  schedule: "30 5 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: check-postgres
+            {{ if eq .Values.postgres.cnpgCluster "true" }}
+            image: {{ .Values.postgres.cnpgClusterImage }}
+            {{ else }}
+            image: postgres:12
+            {{ end }}
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: run-sql-script
+            {{ if eq .Values.postgres.cnpgCluster "true" }}
+            image: {{ .Values.postgres.cnpgClusterImage }}
+            {{ else }}
+            image: postgres:12
+            {{ end }}
+            command: [ "bin/sh", "-c", "PGPASSWORD={{ $cred.secrets.db.pass }} psql -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -a -f /tmp/reindex-biggest-tables.sql" ]
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.global.project_name }}-postgres-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-db-script
+              mountPath: /tmp/reindex-biggest-tables.sql
+              subPath: "reindex-biggest-tables.sql"
+          volumes:
+          - name: {{ .Values.global.project_name }}-db-script
+            configMap:
+              name: {{ .Values.global.project_name }}-sql-reindex-query

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-engine
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-engine
+spec:
+  replicas: {{ int .Values.engine.replica }}
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-engine
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.project_name }}-engine
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      initContainers:
+      - name: init-postgres
+        image: postgres:12
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+            PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+            until $PG_READY;
+            do
+              sleep 2;
+            done;
+            echo "Database ready to accept connections."  ;
+      - name: init-redis
+        image: busybox:1.28
+        command: ["sh", "-c", "until nslookup {{ .Values.global.redis_host }} ; do echo waiting for {{ .Values.global.redis_port }} ; sleep 2; done;"]     
+      containers:
+      - name: {{ .Values.global.project_name }}-engine
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-engine-config
+        image: {{ .Values.engine.image }}:{{ .Values.engine.tag }}
+        imagePullPolicy: "IfNotPresent"
+        args: ["npm", "run", "start:prod"]
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.engine.resources $.Values.engine.sizing ) }}
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: {{ int .Values.engine.containerPort }}
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-engine-data
+          mountPath: /opt/novatalks.engine/store
+          subPath: coredata
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.global.project_name }}-engine-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.project_name }}-static-pvc
+status: {}

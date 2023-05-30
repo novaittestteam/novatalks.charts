@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-rescue
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-rescue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-rescue
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.project_name }}-rescue
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values:
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers:
+      - name: {{ .Values.global.project_name }}-rescue
+        image: postgres:12
+        command: [ "/bin/sleep" ]
+        args: [ "1h" ]
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.global.project_name }}-postgres-config
+        volumeMounts:
+          - mountPath: /tmp/distibuted
+            name: {{ .Values.global.project_name }}-distributed # mount on old data
+          - mountPath: /tmp/postgres
+            name: {{ .Values.global.project_name }}-postgres # mount on postgre
+            subPath: ./db
+          - mountPath: /tmp/redis
+            name: {{ .Values.global.project_name }}-redis # mount on redis
+            subPath: ./db
+          - mountPath: /tmp/botflow
+            name: {{ .Values.global.project_name }}-botflow # mount on botflow           
+      volumes:
+        - name: {{ .Values.global.project_name }}-distributed
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-distributed-pvc
+        - name: {{ .Values.global.project_name }}-postgres
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-postgres-pvc
+        - name: {{ .Values.global.project_name }}-redis
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-redis-pvc
+        - name: {{ .Values.global.project_name }}-botflow
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-botflow-pvc
+
+

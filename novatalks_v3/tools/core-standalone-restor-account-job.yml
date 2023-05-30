@@ -1,0 +1,737 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-sql-restor-account
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-sql-restor-account
+data:
+  restor-account.sql: |
+    SELECT current_database();
+    
+    /* Update Users */
+
+    UPDATE "users" SET
+    "id" = '1',
+    "provider" = 'email',
+    "uid" = 'support@novatalks.ai',
+    "encrypted_password" = '$2a$12$Uwgwd/.slqeCg3WbEBYII.HyXsAKcmjGVQEu9JPe8zuXyNiNJUEUW',
+    "reset_password_token" = NULL,
+    "reset_password_sent_at" = NULL,
+    "remember_created_at" = NULL,
+    "sign_in_count" = '14',
+    "current_sign_in_at" = '2023-05-11 10:21:16.383+00',
+    "last_sign_in_at" = NULL,
+    "current_sign_in_ip" = '10.42.7.90',
+    "last_sign_in_ip" = '10.42.7.136',
+    "confirmation_token" = NULL,
+    "confirmed_at" = '2023-03-13 12:42:28.608+00',
+    "confirmation_sent_at" = NULL,
+    "unconfirmed_email" = NULL,
+    "name" = 'Support',
+    "display_name" = '',
+    "email" = 'support@novatalks.ai',
+    "active_token" = NULL,
+    "created_at" = '2023-03-13 12:42:28.609+00',
+    "updated_at" = '2023-05-11 12:19:28.996+00',
+    "pubsub_token" = 'VyhWRqIFUNVUKHVsOvVeap',
+    "ui_settings" = '{"historical": {"csatDetail": {"range": {"id": 0, "to": 1680507248, "from": 1680469200}, "showFilters": true}, "tagsDetail": {"range": {"id": 0, "to": 1680511406, "from": 1680469200}, "showFilters": true}, "agentCsatSum": {"range": {"id": 0, "to": 1680507745, "from": 1680469200}, "showFilters": true}, "messagesDetail": {"range": {"id": 4, "to": 1680512196, "from": 1680296400}, "columns": [{"name": "timestamp", "type": "mandatory", "width": 0}, {"name": "content", "type": "mandatory", "width": 0}, {"name": "dialog_id", "type": "mandatory", "width": 0}, {"name": "conversation_id", "type": "shown", "width": 0}, {"name": "inbox_name", "type": "shown", "width": 0}, {"name": "sender_type", "type": "shown", "width": 0}, {"name": "sender_name", "type": "shown", "width": 0}, {"name": "status", "type": "shown", "width": 0}, {"name": "inbox_id", "type": "hidden", "width": 0}, {"name": "sender_id", "type": "hidden", "width": 0}, {"name": "message_type", "type": "hidden", "width": 0}, {"name": "private", "type": "hidden", "width": 0}, {"name": "agent_id", "type": "hidden", "width": 0}, {"name": "agent_name", "type": "hidden", "width": 0}, {"name": "team_id", "type": "hidden", "width": 0}, {"name": "team_name", "type": "hidden", "width": 0}], "pageSize": 10, "showFilters": true}, "agentAvailabilitySum": {"range": {"id": 0, "to": 1680506719, "from": 1680469200}, "showFilters": true}, "agentAvailabilityDetail": {"range": {"id": 0, "to": 1680507872, "from": 1680469200}, "filters": {"agents": [], "events": [], "substatuses": []}, "showFilters": true}}, "lastReport": "messages_detail", "is_macro_open": true, "is_sidebar_open": true, "agentStatusConfig": {"sort": {}, "search": {}, "default": true, "filters": {"teams": [], "inboxes": []}}, "is_ct_labels_open": true, "teamOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"teams": []}}, "agentOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"agents": []}}, "inboxOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"inboxes": []}}, "is_conv_actions_open": true, "is_conv_details_open": true, "is_ct_prev_conv_open": true, "is_ct_custom_attr_open": true, "is_contact_sidebar_open": true}',
+    "custom_attributes" = '{}',
+    "type" = 'SuperAdmin',
+    "message_signature" = NULL,
+    "timezone" = 'Europe/Kiev',
+    "locale" = 'uk',
+    "deleted_at" = NULL,
+    "show_system_messages" = '1'
+    WHERE "pubsub_token" = 'VyhWRqIFUNVUKHVsOvVeap';
+
+    UPDATE "users" SET
+    "id" = '3',
+    "provider" = 'email',
+    "uid" = 'demo_admin@novatalks.ai',
+    "encrypted_password" = '$2a$12$99TnE2RqsyCidjhvc.aKO.z0DPmOuWgRdWi.Q3BjofiEtnM35bWbq',
+    "reset_password_token" = NULL,
+    "reset_password_sent_at" = NULL,
+    "remember_created_at" = NULL,
+    "sign_in_count" = '7',
+    "current_sign_in_at" = '2023-05-11 12:19:03.48+00',
+    "last_sign_in_at" = NULL,
+    "current_sign_in_ip" = '10.42.0.38',
+    "last_sign_in_ip" = '10.42.0.248',
+    "confirmation_token" = NULL,
+    "confirmed_at" = '2023-03-13 12:59:31.808+00',
+    "confirmation_sent_at" = NULL,
+    "unconfirmed_email" = NULL,
+    "name" = 'Demo admin',
+    "display_name" = 'Demo admin',
+    "email" = 'demo_admin@novatalks.ai',
+    "active_token" = NULL,
+    "created_at" = '2023-03-13 12:59:31.808+00',
+    "updated_at" = '2023-05-11 12:20:27.268+00',
+    "pubsub_token" = 'Cj0qzbJH50nug5NrAIjePL',
+    "ui_settings" = '{"historical": {"agentCsatSum": {"range": {"id": 0, "to": 1682611306, "from": 1682542800}, "showFilters": true}, "inboxOverviewSum": {"range": {"id": 0, "to": 1682611315, "from": 1682542800}, "showFilters": true}, "agentAvailabilitySum": {"range": {"id": 0, "to": 1682611290, "from": 1682542800}, "showFilters": true}, "agentAvailabilityDetail": {"range": {"id": 0, "to": 1680444486, "from": 1680382800}, "showFilters": true}}, "lastReport": "inbox_overview", "is_macro_open": true, "is_sidebar_open": true, "agentStatusConfig": {"sort": {"availability_status": "desc"}, "search": {}, "default": true, "filters": {"teams": [], "inboxes": []}}, "teamOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"teams": []}}, "agentOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"agents": []}}, "inboxOverviewConfig": {"sort": {}, "search": {}, "columns": [], "default": true, "filters": {"inboxes": []}}, "is_conv_actions_open": false, "is_conv_details_open": true, "enter_to_send_enabled": false, "is_previous_conv_open": true, "is_contact_sidebar_open": true, "is_contact_attributes_open": true}',
+    "custom_attributes" = '{}',
+    "type" = NULL,
+    "message_signature" = NULL,
+    "timezone" = 'Europe/Kiev',
+    "locale" = 'uk',
+    "deleted_at" = NULL,
+    "show_system_messages" = '1'
+    WHERE "pubsub_token" = 'Cj0qzbJH50nug5NrAIjePL';
+
+    UPDATE "users" SET
+    "id" = '7',
+    "provider" = 'email',
+    "uid" = 'demo_user@novatalks.ai',
+    "encrypted_password" = '$2a$12$D8KUO/2lJZ//Ei5l11rQ/.lzFC3dp/pYndQUnlYCbBMD74wtJYgBC',
+    "reset_password_token" = NULL,
+    "reset_password_sent_at" = NULL,
+    "remember_created_at" = NULL,
+    "sign_in_count" = '0',
+    "current_sign_in_at" = NULL,
+    "last_sign_in_at" = NULL,
+    "current_sign_in_ip" = NULL,
+    "last_sign_in_ip" = NULL,
+    "confirmation_token" = NULL,
+    "confirmed_at" = '2023-04-18 14:54:39.235+00',
+    "confirmation_sent_at" = NULL,
+    "unconfirmed_email" = NULL,
+    "name" = 'Demo Agent',
+    "display_name" = 'Demo Agent',
+    "email" = 'demo_agent@novatalks.ai',
+    "active_token" = NULL,
+    "created_at" = '2023-04-18 14:54:39.235+00',
+    "updated_at" = '2023-04-18 14:56:45.836+00',
+    "pubsub_token" = 'Ag3rhfyv8uH17SwooGZGxW',
+    "ui_settings" = '{}',
+    "custom_attributes" = '{}',
+    "type" = NULL,
+    "message_signature" = NULL,
+    "timezone" = 'Europe/Kiev',
+    "locale" = 'uk',
+    "deleted_at" = NULL,
+    "show_system_messages" = '1'
+    WHERE "pubsub_token" = 'Ag3rhfyv8uH17SwooGZGxW';
+
+    SELECT pg_sleep(2);
+
+    /* Update Team */
+
+    UPDATE "teams" SET
+    "id" = '1',
+    "name" = 'support_team',
+    "description" = 'Support_team',
+    "allow_auto_assign" = '0',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 13:00:00.739+00',
+    "updated_at" = '2023-05-12 09:41:12.435+00',
+    "additional_settings" = '{"autoanswer": true, "utilization": 20, "alerting_timeout": 7, "assignment_algorithm": "lac", "allow_acd_for_this_team": true}',
+    "deleted_at" = NULL
+    WHERE "id" = '1';
+
+    /* Update Team Member*/
+
+    UPDATE "team_members" SET
+    "id" = '6',
+    "team_id" = '1',
+    "user_id" = '1',
+    "created_at" = '2023-05-12 09:41:22.032+00',
+    "updated_at" = '2023-05-12 09:41:22.032+00'
+    WHERE "id" = '6';
+
+    UPDATE "team_members" SET
+    "id" = '1',
+    "team_id" = '1',
+    "user_id" = '3',
+    "created_at" = '2023-03-13 13:00:04.23+00',
+    "updated_at" = '2023-03-13 13:00:04.235+00'
+    WHERE "id" = '1';
+
+    UPDATE "team_members" SET
+    "id" = '5',
+    "team_id" = '1',
+    "user_id" = '7',
+    "created_at" = '2023-05-12 09:41:22.031+00',
+    "updated_at" = '2023-05-12 09:41:22.031+00'
+    WHERE "id" = '5';
+
+
+    /* Update Inbox*/
+
+    UPDATE "inboxes" SET
+    "id" = '2',
+    "channel_id" = '1',
+    "account_id" = '1',
+    "name" = 'Online Chats',
+    "created_at" = '2023-03-13 13:01:44.011+00',
+    "updated_at" = '2023-03-13 13:01:44.011+00',
+    "channel_type" = 'WebWidget',
+    "enable_auto_assignment" = '0',
+    "greeting_enabled" = '0',
+    "greeting_message" = '',
+    "email_address" = NULL,
+    "working_hours_enabled" = '0',
+    "out_of_office_message" = NULL,
+    "timezone" = 'UTC',
+    "enable_email_collect" = '0',
+    "csat_survey_enabled" = '0',
+    "allow_messages_after_resolved" = '1',
+    "additional_settings" = '{"autoanswer": true, "utilization": 20, "alerting_timeout": 7}',
+    "chatbot_setting_id" = '1',
+    "deleted_at" = NULL
+    WHERE "id" = '2';
+
+    UPDATE "inboxes" SET
+    "id" = '1',
+    "channel_id" = '1',
+    "account_id" = '1',
+    "name" = 'Messenger',
+    "created_at" = '2023-03-13 13:01:20.713+00',
+    "updated_at" = '2023-03-13 13:01:20.713+00',
+    "channel_type" = 'Api',
+    "enable_auto_assignment" = '0',
+    "greeting_enabled" = '0',
+    "greeting_message" = '',
+    "email_address" = NULL,
+    "working_hours_enabled" = '0',
+    "out_of_office_message" = NULL,
+    "timezone" = 'UTC',
+    "enable_email_collect" = '0',
+    "csat_survey_enabled" = '0',
+    "allow_messages_after_resolved" = '1',
+    "additional_settings" = '{"autoanswer": true, "utilization": 20, "alerting_timeout": 7, "can_write_first_to_a_new_client": false, "channel_for_writing_first_to_a_new_client": "whatsapp"}',
+    "chatbot_setting_id" = '1',
+    "deleted_at" = NULL
+    WHERE "id" = '1';
+
+    UPDATE "channel_api" SET
+    "id" = '1',
+    "account_id" = '1',
+    "webhook_url" = 'http://ntk-ua-demo-botflow:1880/redbot/channel-novatalks/1',
+    "identifier" = 'VxrJPEY3gQd6vEFqpwig88',
+    "hmac_token" = NULL,
+    "hmac_mandatory" = '0',
+    "created_at" = '2023-03-13 13:01:20.699+00',
+    "updated_at" = '2023-03-13 13:01:20.699+00'
+    WHERE "id" = '1';
+
+    UPDATE "channel_web_widgets" SET
+    "id" = '1',
+    "account_id" = '1',
+    "website_url" = NULL,
+    "website_token" = 'uS59QT7tahJol9puMmmnFm',
+    "widget_color" = '#009CE0',
+    "welcome_title" = '',
+    "welcome_tagline" = '',
+    "feature_flags" = '3',
+    "reply_time" = 'in_a_few_minutes',
+    "hmac_token" = NULL,
+    "pre_chat_form_enabled" = '0',
+    "pre_chat_form_options" = '{"requireEmail": true, "requirePhoneNumber": true}',
+    "hmac_mandatory" = '0',
+    "continuity_via_email" = '0',
+    "created_at" = '2023-03-13 13:01:43.951+00',
+    "updated_at" = '2023-03-14 07:45:08.88+00',
+    "additional_settings" = '{"locale": "uk", "channels": [{"hint": "Online Chat", "name": "Online Chat", "type": "chat", "enabled": true}, {"url": "http://t.me/NovaTalksDemoBot", "hint": "Telegram", "name": "Telegram", "type": "telegram", "enabled": true}, {"url": "https://m.me/120292827670251", "hint": "Facebook", "name": "Facebook", "type": "messenger", "enabled": true}, {"url": "viber://pa?chatURI=novatalksdemobot", "hint": "Viber", "name": "Viber", "type": "viber", "enabled": true}, {"url": "https://www.instagram.com/novatalksdemopage/", "hint": "Instagram", "name": "Instagram", "type": "instagram", "enabled": true}], "showCloseWidgetIcon": true}'
+    WHERE "id" = '1';
+
+
+    DELETE FROM inboxes WHERE id NOT BETWEEN 1 AND 2;
+
+    DELETE FROM channel_api WHERE id <> 1;
+    DELETE FROM channel_web_widgets WHERE id <> 1;
+
+    /* Update Inbox Member*/
+
+    UPDATE "inbox_members" SET
+    "id" = '7',
+    "user_id" = '1',
+    "inbox_id" = '1',
+    "created_at" = '2023-05-12 09:44:16.651+00',
+    "updated_at" = '2023-05-12 09:44:16.651+00'
+    WHERE "id" = '7';
+
+    UPDATE "inbox_members" SET
+    "id" = '6',
+    "user_id" = '7',
+    "inbox_id" = '1',
+    "created_at" = '2023-05-12 09:44:16.651+00',
+    "updated_at" = '2023-05-12 09:44:16.651+00'
+    WHERE "id" = '6';
+
+    UPDATE "inbox_members" SET
+    "id" = '1',
+    "user_id" = '3',
+    "inbox_id" = '1',
+    "created_at" = '2023-03-13 13:01:23.484+00',
+    "updated_at" = '2023-03-13 13:01:23.484+00'
+    WHERE "id" = '1';
+
+    UPDATE "inbox_members" SET
+    "id" = '2',
+    "user_id" = '3',
+    "inbox_id" = '2',
+    "created_at" = '2023-03-13 13:01:47.826+00',
+    "updated_at" = '2023-03-13 13:01:47.826+00'
+    WHERE "id" = '2';
+
+    UPDATE "inbox_members" SET
+    "id" = '4',
+    "user_id" = '7',
+    "inbox_id" = '2',
+    "created_at" = '2023-05-12 09:44:10.269+00',
+    "updated_at" = '2023-05-12 09:44:10.269+00'
+    WHERE "id" = '4';
+
+    UPDATE "inbox_members" SET
+    "id" = '5',
+    "user_id" = '1',
+    "inbox_id" = '2',
+    "created_at" = '2023-05-12 09:44:10.269+00',
+    "updated_at" = '2023-05-12 09:44:10.269+00'
+    WHERE "id" = '5';
+
+    SELECT pg_sleep(2);
+
+    /* Clean any labels*/
+
+    DELETE FROM labels WHERE id NOT BETWEEN 1 AND 5;
+
+    DELETE FROM tags;
+
+    DELETE FROM taggings;
+
+    SELECT pg_sleep(2);
+
+    /* Clean custom attribute and filters*/
+
+    DELETE FROM custom_attribute_definitions;
+
+    DELETE FROM custom_filters;
+
+    SELECT pg_sleep(2);
+
+    /* Update calendar*/
+
+    DELETE FROM calendars WHERE id <> 1;
+
+    UPDATE "calendars" SET
+    "id" = '1',
+    "account_id" = '1',
+    "name" = 'Calendar Default',
+    "description" = '24/7',
+    "timezone" = 'Europe/Kiev',
+    "created_at" = '2023-03-13 12:42:30.939+00',
+    "updated_at" = '2023-03-13 12:42:30.939+00'
+    WHERE "id" = '1';
+
+    UPDATE "calendar_owners" SET
+    "id" = '1',
+    "account_id" = '1',
+    "calendar_id" = '1',
+    "owner_id" = '1',
+    "owner_type" = 'ChatbotSetting',
+    "created_at" = '2023-03-13 12:42:31.213+00',
+    "updated_at" = '2023-03-13 12:42:31.213+00'
+    WHERE "id" = '1';
+
+    UPDATE "working_hours" SET
+    "id" = '1',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '0',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '1';
+
+    UPDATE "working_hours" SET
+    "id" = '2',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '1',
+    "closed_all_day" = '0',
+    "open_hour" = '10',
+    "open_minutes" = '0',
+    "close_hour" = '11',
+    "close_minutes" = '30',
+    "exception_day" = NULL,
+    "open_all_day" = '0'
+    WHERE "id" = '2';
+
+    UPDATE "working_hours" SET
+    "id" = '3',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '2',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '3';
+
+    UPDATE "working_hours" SET
+    "id" = '4',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '3',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '4';
+
+    UPDATE "working_hours" SET
+    "id" = '5',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '4',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '5';
+
+    UPDATE "working_hours" SET
+    "id" = '6',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '5',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '6';
+
+    UPDATE "working_hours" SET
+    "id" = '7',
+    "calendar_id" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 12:42:30.948+00',
+    "updated_at" = '2023-03-13 12:42:30.948+00',
+    "day_of_week" = '6',
+    "closed_all_day" = '0',
+    "open_hour" = '0',
+    "open_minutes" = '0',
+    "close_hour" = '23',
+    "close_minutes" = '59',
+    "exception_day" = NULL,
+    "open_all_day" = '1'
+    WHERE "id" = '7';
+
+    SELECT pg_sleep(2);
+
+    /* Update chatboot*/
+
+    DELETE FROM calendars WHERE id <> 1;
+
+    UPDATE "chatbot_settings" SET
+    "id" = '1',
+    "account_id" = '1',
+    "name" = 'ChatBot Default',
+    "description" = 'ChatBot Default',
+    "language_request" = '{"enable": true, "buttons": [{"lang": "ua", "active": true, "button_code": 1, "button_label": "Українська"}, {"lang": "ru", "active": true, "button_code": 2, "button_label": "Русский"}, {"lang": "en", "active": true, "button_code": 3, "button_label": "English"}], "message": "Выберите ваш язык. Please, choose your language"}
+    ',
+    "main_settings" = '{"end_dialog": {"language": {"en": {"resolve_message_agent": "Your dialogue is completed", "resolve_message_client": "We are always happy to help🤗", "resolve_message_inactive_agent": "Your dialogue is completed", "resolve_message_inactive_client": "Your dialogue is completed"}, "ru": {"resolve_message_agent": "Ваш диалог завершен", "resolve_message_client": "Ваш диалог завершен", "resolve_message_inactive_agent": "Ваш диалог завершен", "resolve_message_inactive_client": "Ваш диалог завершен"}, "ua": {"resolve_message_agent": "Ваш діалог завершено", "resolve_message_client": "Якщо у вас виникнуть питання, пишіть, ми завжди раді допомогти🤗", "resolve_message_inactive_agent": "Ваш діалог завершено", "resolve_message_inactive_client": "Ваш діалог завершено"}}, "logic_type": "standard", "resolve_agent": true, "resolve_client": true, "resolve_inactive_agent": true, "resolve_inactive_client": true}, "start_dialog": {"enable": true, "language": {"en": {"welcome_message": "Hi☺️ We are happy to see you again)"}, "ru": {"welcome_message": "Приветвуем☺️ Очень рады вас видеть снова)"}, "ua": {"welcome_message": "Привіт☺️ Дуже раді знову вас бачити)"}}, "logic_type": "standard"}, "timeout_settings": {"agent_inactivity": 4320, "client_inactivity": 30}, "transfer_settings": {"team": 8, "language": {"en": {"transfer_message": "Wait, the agent will connect to the conversation shortly"}, "ru": {"transfer_message": "Ожидайте, оператор подключится к разговору в ближайшее время"}, "ua": {"transfer_message": "Очікуйте, оператор підключиться до розмови найближчим часом"}}, "message_enable": true, "same_agent_timeout": 1}}
+    ',
+    "agent_schedule" = '{"enable": true, "calendar": {"id": 1}, "non_working_time": {"action": "transfer", "language": {"en": {"non_working_time_message": "We are not working now."}, "ru": {"non_working_time_message": "Вы обратились в нерабочее время."}, "ua": {"non_working_time_message": "Ви звернулись у неробочий час."}}, "logic_type": "standard", "transfer_team_id": 0}}
+    ',
+    "menu" = '{"enable": true, "buttons": {"language": {"en": {"message": "Please, choose the topic of your request"}, "ru": {"message": "Пожалуйста, выберите тематику вашего обращения"}, "ua": {"message": "Будь ласка, оберіть тему вашого звернення"}}, "childrens": [{"action": "subflow", "language": {"en": {"message": "What do you want to know about cards?", "button_label": "Cards💳"}, "ru": {"message": "Что именно вас интересует по картам?", "button_label": "Карты💳"}, "ua": {"message": "Що саме вас цікавить по картам?", "button_label": "Карти💳"}}, "childrens": [{"action": "transfer", "language": {"en": {"message": "Wait, the agent will connect to the conversation shortly", "button_label": "Card balance⚖️"}, "ru": {"message": "Ожидайте, оператор подключится к разговору в ближайшее время", "button_label": "Баланс карты⚖️"}, "ua": {"message": "Очікуйте, оператор підключиться до розмови найближчим часом", "button_label": "Баланс карти⚖️"}}, "button_code": 1, "transfer_team_id": 0}, {"action": "transfer", "language": {"en": {"message": "Wait, the agent will connect to the conversation shortly", "button_label": "Card block🛑"}, "ru": {"message": "Ожидайте, оператор подключится к разговору в ближайшее время", "button_label": "Блокировка карты🛑"}, "ua": {"message": "Очікуйте, оператор підключиться до розмови найближчим часом", "button_label": "Блокування карти🛑"}}, "button_code": 2, "transfer_team_id": 0}, {"action": "subflow", "language": {"en": {"message": "Oh cool! We are glad that you are interested in our product🥰 Choose the card you are interested in and we will quickly prepare all the documents for registration🤗", "button_label": "Open new card✅"}, "ru": {"message": "Отлично! Ми рады, что вас заинтересовал наш продукт 🥰 \nВыберите карту, что вас заинтересовала и мы быстро подготовим все документы для оформления 🤗", "button_label": "Открыть карту✅"}, "ua": {"message": "О, круто! Ми раді, що вас зацікавив наш продукт 🥰 \nОберіть карту, яка вас зацікавила і ми швиденько підготуємо всі документи для оформлення🤗", "button_label": "Відкрити карту✅"}}, "childrens": [{"action": "transfer", "language": {"en": {"message": "Wait, the agent will connect to the conversation shortly", "button_label": "Classic"}, "ru": {"message": "Ожидайте, оператор подключится к разговору в ближайшее время", "button_label": "Classic"}, "ua": {"message": "Очікуйте, оператор підключиться до розмови найближчим часом", "button_label": "Classic"}}, "button_code": 1, "transfer_team_id": 1}, {"action": "subflow", "language": {"en": {"message": "Thanks for the order) We will contact you as soon as everything is ready❤️\nDo you have any other questions?", "button_label": "Super💫"}, "ru": {"message": "Спасибо за заказ) Ми с вами свяжемся как только все будет готово ❤️\nЕсть ли у вас еще вопросы?", "button_label": "Super💫"}, "ua": {"message": "Дякуємо за замовлення) Ми з вами зв''яжемось як тільки все буде готово❤️\nЧи є у вас ще запитання?", "button_label": "Super💫"}}, "childrens": [{"action": "transfer", "language": {"en": {"message": "I''m in a hurry to connect you with the agent🏃🏃🏃", "button_label": "Yes👩‍💻"}, "ru": {"message": "Спешу соединить вас с оператором🏃🏃🏃", "button_label": "Да👩‍💻"}, "ua": {"message": "Побіг з''єднувати вас з оператором🏃🏃🏃", "button_label": "Так👩‍💻"}}, "button_code": 1, "transfer_team_id": 0}], "button_code": 2}], "button_code": 3}, {"action": "transfer", "language": {"en": {"message": "Wait, the agent will connect to the conversation shortly", "button_label": "Other👩‍💻"}, "ru": {"message": "Ожидайте, оператор подключится к разговору в ближайшее время", "button_label": "Другое👩‍💻"}, "ua": {"message": "Очікуйте, оператор підключиться до розмови найближчим часом", "button_label": "Інше👩‍💻"}}, "button_code": 4, "transfer_team_id": 1}], "button_code": 1}, {"action": "transfer", "language": {"en": {"message": "Wait, the agent will connect to the conversation shortly", "button_label": "Loans🤑"}, "ru": {"message": "Ожидайте, оператор подключится к разговору в ближайшее время", "button_label": "Кредиты🤑"}, "ua": {"message": "Очікуйте, оператор підключиться до розмови найближчим часом", "button_label": "Кредити🤑"}}, "button_code": 2, "transfer_team_id": 0}]}, "logic_type": "standard", "back_button": true, "main_menu_button": true, "end_dialog_button": true, "disable_non_working_time": false}
+    ',
+    "csat" = '{"enable": true, "language": {"en": {"buttons": [{"button_code": 1, "button_label": "Very bad 😩"}, {"button_code": 2, "button_label": "Bad 😕"}, {"button_code": 3, "button_label": "So-so 😐"}, {"button_code": 4, "button_label": "Good 😊"}, {"button_code": 5, "button_label": "Excellent 😄"}], "end_message": "Thank you😉", "start_message": "Please, rate your conversation"}, "ru": {"buttons": [{"button_code": 1, "button_label": "Очень плохо 😩"}, {"button_code": 2, "button_label": "Плохо 😕"}, {"button_code": 3, "button_label": "Удовлетворительно 😐"}, {"button_code": 4, "button_label": "Хорошо 😊"}, {"button_code": 5, "button_label": "Прекрасно 😄"}], "end_message": "Спасибо!", "start_message": "Пожалуйста, оцените ваш разговор"}, "ua": {"buttons": [{"button_code": 1, "button_label": "Дуже погано 😩"}, {"button_code": 2, "button_label": "Погано 😕"}, {"button_code": 3, "button_label": "Задовільно 😐"}, {"button_code": 4, "button_label": "Добре 😊"}, {"button_code": 5, "button_label": "Відмінно 😄"}], "end_message": "Дякуємо😉", "start_message": "Будь ласка, оцініть вашу розмову"}}, "logic_type": "standard"}
+    ',
+    "created_at" = '2023-03-13 12:42:31.023+00',
+    "updated_at" = '2023-03-27 08:17:42.274+00'
+    WHERE "id" = '1';
+
+    SELECT pg_sleep(2);
+
+    /* Update macros*/
+
+    DELETE FROM macros WHERE id NOT BETWEEN 1 AND 2;
+
+    UPDATE "macros" SET
+    "id" = '1',
+    "account_id" = '1',
+    "name" = 'get_email',
+    "actions" = '[{"action_name": "send_custom_event", "action_params": ["custom.bot.get_email"], "action_additional_params": [{"key": "text_get_email_01_ua", "value": "Будь ласка, напишіть ваш email."}, {"key": "text_get_email_01_ru", "value": "Пожалуйста, напишите ваш email."}, {"key": "text_get_email_01_en", "value": "Please, write your email."}]}]',
+    "visibility" = 'global',
+    "created_by_id" = '1',
+    "updated_by_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.548+00',
+    "updated_at" = '2023-04-02 12:44:33.548+00',
+    "system" = '1'
+    WHERE "id" = '1';
+
+    UPDATE "macros" SET
+    "id" = '2',
+    "account_id" = '1',
+    "name" = 'get_phone',
+    "actions" = '[{"action_name": "send_custom_event", "action_params": ["custom.bot.get_phone"], "action_additional_params": [{"key": "text_get_phone_01_ua", "value": "Будь ласка, повідомте ваш номер телефону, натиснувши на кнопку внизу."}, {"key": "text_get_phone_01_ru", "value": "Пожалуйста, сообщите ваш номер телефона, нажав на кнопку внизу."}, {"key": "text_get_phone_01_en", "value": "Please, share your phone number - press the button below."}, {"key": "text_get_phone_02_ua", "value": "Надати мій номер телефону"}, {"key": "text_get_phone_02_ru", "value": "Предоставить мой номер телефона"}, {"key": "text_get_phone_02_en", "value": "Share my phone number"}]}]',
+    "visibility" = 'global',
+    "created_by_id" = '1',
+    "updated_by_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.55+00',
+    "updated_at" = '2023-04-02 12:44:33.55+00',
+    "system" = '1'
+    WHERE "id" = '2';
+
+    SELECT pg_sleep(2);
+
+    /* Update canned_responses*/
+
+    DELETE FROM canned_responses;
+
+    SELECT pg_sleep(2);
+
+    /* Update webhooks*/
+
+    DELETE FROM webhooks;
+
+    SELECT pg_sleep(2);
+
+    /* Update accounts*/
+
+    UPDATE "accounts" SET
+    "id" = '1',
+    "name" = 'NovaTalks',
+    "locale" = 'uk',
+    "domain" = NULL,
+    "support_email" = NULL,
+    "settings_flags" = '0',
+    "feature_flags" = '0',
+    "auto_resolve_duration" = NULL,
+    "limits" = '{"users": 5}',
+    "created_at" = '2023-03-13 12:42:26.745+00',
+    "updated_at" = '2023-04-05 09:18:41.965+00',
+    "push_flags" = '0',
+    "creation_sound" = '',
+    "assignment_sound" = 'alert_1.mp3',
+    "new_message_sound" = 'alert_1.mp3',
+    "mention_sound" = 'alert_1.mp3',
+    "timezone" = 'Europe/Kiev',
+    "logout_option" = 'noWarning',
+    "show_system_messages" = '1'
+    WHERE "id" = '1';
+
+    UPDATE "substatuses" SET
+    "id" = '1',
+    "sequence" = '5',
+    "name" = 'System',
+    "status" = 'busy',
+    "description" = 'Selected automatically when the agent logs in',
+    "system" = '1',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.457+00',
+    "deleted_at" = NULL
+    WHERE "id" = '1';
+
+    UPDATE "substatuses" SET
+    "id" = '2',
+    "sequence" = '6',
+    "name" = 'Not responding',
+    "status" = 'busy',
+    "description" = 'Selected automatically when an agent does not answer an assigned conversation',
+    "system" = '1',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.47+00',
+    "deleted_at" = NULL
+    WHERE "id" = '2';
+
+    UPDATE "substatuses" SET
+    "id" = '3',
+    "sequence" = '1',
+    "name" = 'Break',
+    "status" = 'busy',
+    "description" = 'Break',
+    "system" = '0',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.362+00',
+    "deleted_at" = NULL
+    WHERE "id" = '3';
+
+    UPDATE "substatuses" SET
+    "id" = '4',
+    "sequence" = '2',
+    "name" = 'Lunch',
+    "status" = 'busy',
+    "description" = 'Lunch',
+    "system" = '0',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.371+00',
+    "deleted_at" = NULL
+    WHERE "id" = '4';
+
+    UPDATE "substatuses" SET
+    "id" = '5',
+    "sequence" = '3',
+    "name" = 'Meeting',
+    "status" = 'busy',
+    "description" = 'Meeting',
+    "system" = '0',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.38+00',
+    "deleted_at" = NULL
+    WHERE "id" = '5';
+
+    UPDATE "substatuses" SET
+    "id" = '6',
+    "sequence" = '4',
+    "name" = 'Training',
+    "status" = 'busy',
+    "description" = 'Training',
+    "system" = '0',
+    "active" = '1',
+    "account_id" = '1',
+    "created_at" = '2023-04-02 12:44:33.647+00',
+    "updated_at" = '2023-04-03 07:28:38.447+00',
+    "deleted_at" = NULL
+    WHERE "id" = '6';
+
+    DELETE FROM substatuses WHERE id NOT BETWEEN 1 AND 6;
+
+    SELECT pg_sleep(2);
+
+    /* Update agen_bot*/
+
+    DO $$
+    BEGIN
+        IF EXISTS (SELECT 1 FROM agent_bots WHERE id = '1') THEN
+            UPDATE agent_bots
+            SET id = '1',
+                name = 'AgentBot_1',
+                description = 'AgentBot_1',
+                outgoing_url = 'http://ntk-ua-demo-botflow:1880/redbot/chatwoot-botagent/novatalks-botagent/1',
+                account_id = '1',
+                created_at = '2023-03-13 13:19:08.708+00',
+                updated_at = '2023-03-13 13:19:08.708+00'
+            WHERE id = '1';
+        ELSE
+            INSERT INTO agent_bots (id, name, description, outgoing_url, account_id, created_at, updated_at)
+            VALUES ('1', 'AgentBot_1', 'AgentBot_1', 'http://ntk-ua-demo-botflow:1880/redbot/chatwoot-botagent/novatalks-botagent/1', '1', '2023-03-13 13:19:08.708+00', '2023-03-13 13:19:08.708+00');
+        END IF;
+    END $$;
+
+    UPDATE "agent_bot_inboxes" SET
+    "id" = '1',
+    "inbox_id" = '1',
+    "agent_bot_id" = '1',
+    "status" = 'active',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 13:19:18.144+00',
+    "updated_at" = '2023-03-13 13:19:18.144+00'
+    WHERE "id" = '1';
+
+    UPDATE "agent_bot_inboxes" SET
+    "id" = '2',
+    "inbox_id" = '2',
+    "agent_bot_id" = '1',
+    "status" = 'active',
+    "account_id" = '1',
+    "created_at" = '2023-03-13 13:19:19.717+00',
+    "updated_at" = '2023-03-13 13:19:19.717+00'
+    WHERE "id" = '2';
+
+    SELECT pg_sleep(2);
+
+    /* Update report and clean histori */
+
+    DELETE FROM user_team_interval;
+    DELETE FROM user_substatus_events;
+    DELETE FROM user_interval;
+    DELETE FROM user_events;
+    DELETE FROM user_dialogs;
+    DELETE FROM user_csat_interval;
+    DELETE FROM team_interval;
+    DELETE FROM team_dialogs;
+    DELETE FROM taggings;
+    DELETE FROM conversations;
+    DELETE FROM contacts;
+    DELETE FROM mentions;
+    DELETE FROM messages;
+    
+
+---    
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-maintenance-restor-account--job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-maintenance-restor-account--job
+spec:
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  schedule: "* 5 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: check-postgres
+            image: postgres:12
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: run-sql-script
+            image: postgres:12
+            command: [ "bin/sh", "-c", "PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -a -f /tmp/restor-account.sql" ]
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.global.project_name }}-postgres-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-db-script
+              mountPath: /tmp/restor-account.sql
+              subPath: "restor-account.sql"
+          volumes:
+          - name: {{ .Values.global.project_name }}-db-script
+            configMap:
+              name: {{ .Values.global.project_name }}-sql-restor-account

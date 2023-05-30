@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-db-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-engine
+data:
+  config.js: |
+    module.exports = {
+      development: {
+        dialect: 'postgres',
+        host: 'localhost',
+        port: 5432,
+        username: 'postgres',
+        password: '1111',
+        database: 'test',
+      },
+      test: {
+        dialect: 'postgres',
+        host: 'localhost',
+        port: 5432,
+        username: 'postgres',
+        password: 'password',
+        database: 'test',
+      },
+      production: {
+        dialect: "{{ .Values.env.ENGINE_DATABASE_DIALECT }}",
+        host: "{{ .Values.env.ENGINE_DATABASE_HOST }}",
+        port: "{{ .Values.env.ENGINE_DATABASE_PORT }}",
+        username: "{{ .Values.env.ENGINE_DATABASE_USERNAME }}",
+        password: "password",
+        database: "{{ .Values.env.ENGINE_DATABASE_NAME }}",
+      },
+    };

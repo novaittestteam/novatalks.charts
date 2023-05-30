@@ -1,0 +1,15 @@
+{{ if or (eq .Values.postgres.cnpgCluster "false") (eq .Values.postgres.cnpgMigration "true") }}
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-postgres-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+data:
+  POSTGRES_DB: {{ .Values.global.db_name }}
+  POSTGRES_USER: {{ .Values.global.db_user }}
+  POSTGRES_PASSWORD: {{ $cred.secrets.db.pass | quote }}
+  REDIS_PASSWORD: {{ $cred.secrets.redis.pass | quote }}
+{{ end }}

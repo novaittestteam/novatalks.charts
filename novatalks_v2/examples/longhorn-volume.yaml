@@ -1,0 +1,36 @@
+{{ if eq .Values.global.storage "longhorn" }}
+
+apiVersion: longhorn.io/v1beta1
+kind: Volume
+metadata:
+  name: {{ .Values.global.project_name }}-novatalks-app
+  namespace: longhorn-system
+  labels: 
+    app: {{ .Values.global.project_name }}-storage
+    longhornvolume: {{ .Values.global.project_name }}-novatalks-app
+    recurring-job-group.longhorn.io/default: enabled
+spec:
+  Standby: false
+  accessMode: rwx
+  backingImage: ''
+  baseImage: ''
+  dataLocality: disabled
+  dataSource: ''
+  disableFrontend: false
+  diskSelector: null
+  encrypted: false
+  engineImage: rancher/mirrored-longhornio-longhorn-engine:v1.2.4
+  fromBackup: ''
+  frontend: blockdev
+  lastAttachedBy: ''
+  migratable: false
+  migrationNodeID: ''
+  #nodeID: dev-01-k3sa01d.dev.novait.local
+  nodeSelector: null
+  numberOfReplicas: 2
+  replicaAutoBalance: ignored
+  revisionCounterDisabled: false
+  size: '10737418240' # 10 GiB
+  staleReplicaTimeout: 30
+
+{{ end }}

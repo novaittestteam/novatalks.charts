@@ -1,0 +1,57 @@
+#Copy this script to templates/ 
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.global.project_name }}-addtitional-public-route-processing
+  namespace: ingress-gateways
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  #Example of API Endpoint for Core
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/api/v1/accounts/{id:[0-9]}/conversations/meta`)
+    kind: Rule
+    middlewares:
+      - name: {{ .Values.global.project_name }}-middlewares-chain
+        namespace: ingress-gateways
+    services:
+      - name: {{ .Values.global.project_name }}-engine
+        namespace: {{ .Values.global.customer_name }}
+        port: {{ .Values.engine.servicePort }}
+  tls:
+    secretName: {{ .Values.global.project_name }}-tls-cert
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Values.global.project_name }}-middlewares-chain
+  namespace: ingress-gateways
+spec:
+  chain:
+    middlewares:
+    - name: {{ .Values.global.project_name }}-ratelimit
+    - name: {{ .Values.global.project_name }}-inflightreq
+---
+#Returns 429 Response Code
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Values.global.project_name }}-ratelimit
+  namespace: ingress-gateways
+spec:
+  rateLimit:
+    average: 10 
+    burst: 15
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Values.global.project_name }}-inflightreq
+  namespace: ingress-gateways
+spec:
+  inFlightReq:
+    amount: 10 

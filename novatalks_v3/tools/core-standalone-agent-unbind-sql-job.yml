@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-sql-agent-unbind-query
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-sql-agent-unbind-query
+data:
+  agent-unbind-conversations.sql: |
+    SELECT current_database();
+    EXPLAIN (ANALYZE, TIMING on);
+    UPDATE "conversations" SET "assignee_id" = NULL WHERE "created_at" BETWEEN date_trunc('month', current_date - interval '1' month) AND date_trunc('month', current_date) - interval '1' day AND "status" != 'open' AND "assignee_id" IS NOT NULL;
+    SELECT pg_sleep(10);
+    UPDATE "conversations" SET "team_id" = NULL WHERE "created_at" BETWEEN date_trunc('month', current_date - interval '1' month) AND date_trunc('month', current_date) - interval '1' day AND "status" != 'open' AND "team_id" IS NOT NULL;
+    SELECT pg_sleep(10);
+    EXPLAIN (ANALYZE, TIMING on, SUMMARY);
+
+---    
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-maintenance-agent-unbind--job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-maintenance-agent-unbind--job
+spec:
+  schedule: "0 3 1 * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: check-postgres
+            image: postgres:12
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: run-sql-script
+            image: postgres:12
+            command: [ "bin/sh", "-c", "PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -a -f /tmp/agent-unbind-conversations.sql" ]
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.global.project_name }}-postgres-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-db-script
+              mountPath: /tmp/agent-unbind-conversations.sql
+              subPath: "agent-unbind-conversations.sql"
+          volumes:
+          - name: {{ .Values.global.project_name }}-db-script
+            configMap:
+              name: {{ .Values.global.project_name }}-sql-agent-unbind-query

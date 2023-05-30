@@ -1,0 +1,60 @@
+{{ if eq .Values.global.migration "on" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.project_name }}-longhorn-migration
+  namespace: {{ .Values.global.customer_name }}  # namespace where the pvc's exist
+spec:
+  completions: 1
+  parallelism: 1
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      name: {{ .Values.global.project_name }}-longhorn-migration
+      labels:
+        name: {{ .Values.global.project_name }}-longhorn-migration
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values:
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      restartPolicy: Never
+      containers:
+        - name: {{ .Values.global.project_name }}-longhorn-migration
+          image: busybox:1.28
+          tty: true
+          command: [ "/bin/sh" ]
+          args:
+              - -c
+              - >-
+                cp -r -v /mnt/old/db /mnt/old/userdata /mnt/new/ > ./migration.log;
+                if [ $? -eq 0 ];
+                then
+                  echo "Copying completed successfully" >> ./migration.log;
+                  cp ./migration.log /mnt/new/db/redis/;
+                  cp ./migration.log /mnt/new/db/postgres;
+                  cp ./migration.log /mnt/new/userdata;
+                  rm -rf /mnt/old/db;
+                  rm -rf /mnt/old/userdata;
+                  echo "Cleaning old volume completed";
+                else 
+                  echo "Copying failed";
+                fi;          
+          volumeMounts:
+            - name: old-vol
+              mountPath: /mnt/old/
+            - name: new-vol
+              mountPath: /mnt/new/
+      volumes:
+        - name: old-vol
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-storage-pvc  # change to data source pvc
+        - name: new-vol
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-distributed-pvc  # change to data target pvc
+{{ end }}

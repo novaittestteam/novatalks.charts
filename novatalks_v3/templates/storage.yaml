@@ -1,0 +1,108 @@
+{{ if eq .Values.global.datastore.storage.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-storage-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-storage
+    type: {{ .Values.global.datastore.storage.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.storage.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.storage.type }}
+  {{ if eq .Values.global.datastore.storage.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-storage
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.storage.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.storage.type "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-storage
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-storage
+    type: {{ .Values.global.datastore.storage.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.storage.size }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-storage/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}
+
+
+{{  if eq .Values.global.datastore.distributed.is_set "true" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-distributed-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-distributed
+    type: {{ .Values.global.datastore.distributed.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.distributed.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.distributed.type }}
+  {{ if eq .Values.global.datastore.distributed.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-distributed
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.distributed.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.distributed.type "local-path"  }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-distributed
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-distributed
+    type: {{ .Values.global.datastore.distributed.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.distributed.size }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-distributed/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}

@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-sql-cleaning-query
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-sql-cleaning-query
+data:
+  delete-empty-contacts.sql: |
+    SELECT current_database();
+    EXPLAIN (ANALYZE, TIMING on)
+    CREATE TEMP TABLE del AS
+    SELECT c1.id 
+    FROM 
+      contacts as c1
+      join
+      contacts as c2 on c1.id = c2.id AND c1.last_activity_at IS NULL
+    WHERE c2.name IS NOT NULL;
+    SELECT pg_sleep(10);
+    EXPLAIN (ANALYZE, TIMING on, SUMMARY) DELETE FROM contacts where id in (SELECT id FROM del);
+
+---    
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-maintenance-cleaning--job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-maintenance-cleaning--job
+spec:
+  schedule: "0 5 * * *"
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: check-postgres
+            image: postgres:12
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: run-sql-script
+            image: postgres:12
+            command: [ "bin/sh", "-c", "PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -a -f /tmp/delete-empty-contacts.sql" ]
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.global.project_name }}-postgres-config
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-db-script
+              mountPath: /tmp/delete-empty-contacts.sql
+              subPath: "delete-empty-contacts.sql"
+          volumes:
+          - name: {{ .Values.global.project_name }}-db-script
+            configMap:
+              name: {{ .Values.global.project_name }}-sql-cleaning-query

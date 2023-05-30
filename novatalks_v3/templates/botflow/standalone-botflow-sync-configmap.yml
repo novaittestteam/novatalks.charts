@@ -1,0 +1,165 @@
+{{ if eq .Values.env.BF_MULTINODE_SYNC "true" }}
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-botflow-sync-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+data:
+  settings.js: |
+    //APilganchuk. Configuration for Flows store in Redis
+    const redis_config = {
+      host: process.env.BF_REDIS_HOST,
+      port: process.env.BF_REDIS_PORT,
+      db: process.env.BF_REDIS_DB,
+      password:  process.env.BF_REDIS_PASSWORD !== null ? process.env.BF_REDIS_PASSWORD : ""
+    };
+    //APilganchuk API Token Generator
+    const admin_api_token = (function () { return String.fromCodePoint(...Array.from({length: 24}, () => Math.floor(Math.random() * 57) + 65)) }) ();
+
+    const log4js = require('log4js')
+    log4js.configure({ 
+        appenders: {
+            file: {
+                type: 'file',
+                filename: '/var/log/nova.botflow/botflow.log',
+                maxLogSize: 52428800, 
+                backups: 5,
+                compress: true,
+                keepFileExt: true
+            }
+        },
+        categories: {
+            default: {appenders: ['file'], level:'trace'}
+        }
+    });
+    const logger = log4js.getLogger('nova');
+    module.exports = {
+            flowFile: "flows.json",
+            credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET || false,
+            flowFilePretty: true,
+            userDir: './userdata',
+            uiHost: '0.0.0.0',
+            adminAuth: {
+                "type": "credentials",
+                "users": [
+                    {
+                        "username": "{{ $cred.secrets.botflow.admin.username }}",
+                        "password": "{{ $cred.secrets.botflow.admin.password }}",
+                        "permissions": "*"
+                    },
+                    {
+                        "username": "{{ $cred.secrets.botflow.user.username }}",
+                        "password": "{{ $cred.secrets.botflow.user.password }}",
+                        "permissions": "read"
+                    },
+                    {
+                        "username": 'mutinode-sync-svc',
+                    }
+                ],
+                tokens: [
+                  {
+                        token: admin_api_token,
+                        user: 'mutinode-sync-svc',
+                        scope: ['flows.write','flows.read']
+                  }
+                ]
+            },
+            uiPort: process.env.PORT || 1880,
+            httpAdminRoot: '/redbot',
+            logging: {
+                console: {
+                    level: "info",
+                    metrics: false,
+                    audit: false
+                },
+                log4js: {
+                    level: 'trace',
+                    metrics: false,
+                    audit: true,
+                    handler: function(settings) {
+                        return function(msg) {
+                            const message = JSON.stringify(msg);
+                            switch (msg.level) {
+                                    case 10: 
+                                        logger.fatal(message); 
+                                        break;
+                                    case 20: 
+                                        logger.error(message); 
+                                        break;
+                                    case 30: 
+                                        logger.warn(message); 
+                                        break;
+                                    case 50: 
+                                        logger.debug(message); 
+                                        break;
+                                    case 40:     
+                                    case 98: 
+                                    case 99: 
+                                        logger.info(message); 
+                                        break;
+                                    default: 
+                                        logger.trace(message);                       
+                            }
+                        }
+                    }
+                }
+              },
+              contextStorage: {
+                  default: "file",
+                  memoryOnly: { module: 'memory' },
+                  file: { module: 'localfilesystem' }
+              },
+              exportGlobalContextKeys: false,
+              externalModules: {
+              },
+              editorTheme: {
+                  palette: {
+                  },
+                  projects: {
+                      enabled: false,
+                      workflow: {
+                          mode: "manual"
+                      }
+                  },
+                  codeEditor: {
+                      lib: "monaco",
+                      options: {
+                          theme: "vs",
+                      }
+                  }
+              },
+              functionExternalModules: true,
+                functionGlobalContext: {
+                //Botflow Autoscaling by APilganchuk. Call function inplace
+                sys_global_conf: {
+                  getApiRoot: function () {
+                    let settings =  require('node-red').settings;
+                    let scheme = settings.get('requireHttps') != null ? 'https' : 'http';
+                    let host = settings.get('uiHost') == '0.0.0.0' ? '127.0.0.1' : settings.get('uiHost');
+                    let port = settings.get('uiPort');
+                    let httpAdminRoot = settings.get('httpAdminRoot');
+                    return scheme + '://' + host  + ':' + port + httpAdminRoot;
+                  },
+                  getApiToken: function () { return admin_api_token },
+                  getRedisConfig: function () { return redis_config },
+                  getSysFlowNames: function () { return { sync: 'Sys_Sync', migration: 'Sys_Migration'} }
+                },
+                os:require('os'),
+                env: process.env,
+                environment: process.env.NODE_ENV,
+              },            
+              debugMaxLength: 1000,
+              mqttReconnectTime: 15000,
+              serialReconnectTime: 15000,
+              redis: process.env.BF_CONFIG_STORAGE_TYPE == "redis" ? redis_config : null,
+              storageModule: process.env.BF_CONFIG_STORAGE_TYPE == "redis" ? require("node-red-contrib-redis-storage") : null,
+              runtimeState: {
+                enabled: true,
+                ui: true,
+              },
+
+      };
+{{ end }}
