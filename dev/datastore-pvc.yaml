@@ -1,0 +1,88 @@
+{{ if eq .Values.global.datastore.storage.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-storage-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-storage
+    type: {{ .Values.global.datastore.storage.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.storage.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.storage.type }}
+  {{ if eq .Values.global.datastore.storage.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-storage
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.storage.size }}
+status: {}
+
+
+
+{{ else if eq .Values.global.datastore.distributed.is_set "true" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-distributed-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-distributed
+    type: {{ .Values.global.datastore.distributed.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.distributed.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.distributed.type }}
+  {{ if eq .Values.global.datastore.distributed.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-distributed
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.distributed.size }}
+status: {}
+
+{{ else if eq .Values.global.datastore.static.is_set "true" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-static-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-static
+    type: {{ .Values.global.datastore.static.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.static.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.static.type }}
+  {{ if eq .Values.globaldatastore.static.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-static
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.static.size }}
+status: {}
+
+{{ end }}
