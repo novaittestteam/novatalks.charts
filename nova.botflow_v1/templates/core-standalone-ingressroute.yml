@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.global.project_name }}-route-https
+  namespace: ingress-gateways
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/redbot`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-botflow
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.botflow.servicePort }}
+  tls:
+    secretName: {{ .Values.global.project_name }}-tls-cert

@@ -1,0 +1,51 @@
+# Default values for NovaTalks
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Overrides the image tag whose default is the chart appVersion.
+
+global:
+  #Must be changed in all config below, like a db-host, redis-host
+  project_name: &project_name nfb-ua-novait
+  #Namespace
+  customer_name: &customer_name ua-novait
+  #DB Connection settings
+  customer_fqdn: "novait.k3s.dev.novait.com.ua"
+  storage: longhorn #local-path or longhorn or longhorn-migratable(with Retain data policy) - this storage class must be created
+  storage_retention: Delete #longhorn only
+                     #Retain - pv will be not deleted.
+                     #Recycle - pv will be cleaned.
+                     #Delete - pv will be deleted.
+
+  nodeBind: 
+    prefered: dev-01-k3sa01d.dev.novait.local
+    alter: dev-01-k3sa02d.dev.novait.local
+
+botflow:
+  replica: 1
+  image: apilganchuk/nova-botflow
+  tag: 2022_R3-1
+  containerPort: 1880
+  servicePort: 1880
+  sizing: small
+  resources:
+    small:
+      cpu: 150m
+      memory: 512Mi
+    medium:
+      cpu: 200m
+      memory: 768Mi
+    large:
+      cpu: 300m
+      memory: 1024Mi
+redis: 
+  sizing: small
+  resources:
+    small:
+      cpu: 50m
+      memory: 128Mi
+    medium:
+      cpu: 100m
+      memory: 256Mi
+    large:
+      cpu: 150m
+      memory: 512Mi

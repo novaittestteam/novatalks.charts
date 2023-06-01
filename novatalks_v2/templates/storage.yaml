@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-storage-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+    app: {{ .Values.global.project_name }}-redis
+    app: {{ .Values.global.project_name }}-postgres
+    app: {{ .Values.global.project_name }}-core-web
+    app: {{ .Values.global.project_name }}-core-worker
+    type: {{ .Values.global.storage }}
+{{ if eq .Values.global.storage "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.storage }}
+  {{ if eq .Values.global.storage "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-storage 
+  {{ end }}
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+status: {}
+
+
+{{ if eq .Values.global.storage "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-storage
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+    app: {{ .Values.global.project_name }}-redis
+    app: {{ .Values.global.project_name }}-postgres
+    app: {{ .Values.global.project_name }}-core-web
+    app: {{ .Values.global.project_name }}-core-worker
+    app: {{ .Values.global.project_name }}-core-web-data
+    type: {{ .Values.global.storage }}
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-storage/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end  }}

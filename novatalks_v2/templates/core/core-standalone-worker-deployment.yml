@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-core-worker
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-core-worker
+spec:
+  replicas: {{ .Values.worker.replica }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-core-worker
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.global.project_name }}-core-worker
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers: 
+      # - args:
+      #   - bundle
+      #   - exec
+      #   - sidekiq
+      #   - -C
+      #   - config/sidekiq.yml
+      #   command:
+      #   - docker/entrypoints/rails.sh
+      - name: {{ .Values.global.project_name }}-core-worker
+        image: {{ .Values.worker.image }}:{{ .Values.worker.tag }}
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.web.resources $.Values.web.sizing ) }}
+          requests:
+            memory: "384Mi"
+            cpu: "75m"
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-config
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-core-worker-data
+          mountPath: /app/storage
+          subPath: coredata
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.global.project_name }}-core-worker-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.project_name }}-storage-pvc
+status: {}
