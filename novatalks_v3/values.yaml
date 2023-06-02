@@ -13,8 +13,8 @@ global:
   #Namespace
   customer_name: &customer_name dev-novait-argo
   #DB Connection settings
-  customer_fqdn: "novait.k3s.dev.novait.com.ua"
-  customer_fqdn_int: "novait.k3s.dev.novait.local"
+  customer_fqdn: "novait-argo.k3s.dev.novait.com.ua"
+  customer_fqdn_int: "novait-argo.k3s.dev.novait.local"
   db_host: &db_host ntk-dev-novait-argo-postgres
   #db_host: &db_host ntk-dev-novait-argo-postgres-cluster-rw #In case of CloudNativePG
   db_name: &db_name ntk-dev-novait-argo-novatalks
