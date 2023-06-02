@@ -65,7 +65,7 @@ global:
     #alter: dev-01-k3sa02d.dev.novait.local
   nodeBindPostgresCluster:
     prefered: dev-01-k3sa01d.dev.novait.local
-    alter: dev-01-k3sa02d.dev.novait.local
+    #alter: dev-01-k3sa02d.dev.novait.local
 
 ui:
   replica: 1
@@ -131,8 +131,8 @@ postgres:
     large:
       cpu: 650m
       memory: 2048Mi
-  cnpgCluster: "true"
-  cnpgMigration: "true" #Only for initial data migration in deployed installations. It turns on simple Postgres and CNPG Cluster.
+  cnpgCluster: "false"
+  cnpgMigration: "false" #Only for initial data migration in deployed installations. It turns on simple Postgres and CNPG Cluster.
   cnpgClusterImage: ghcr.io/cloudnative-pg/postgresql:15.2
   cnpgClusterReplica: 1
   cnpgClusterBackupPath: "s3://dev-01-dev-longhorn-backup-bucket/"
