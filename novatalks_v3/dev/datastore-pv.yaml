@@ -1,0 +1,68 @@
+{{ if and (eq .Values.global.datastore.storage.is_set "true") (eq .Values.global.datastore.storage.type "local-path") }}
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-storage
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-storage
+    type: {{ .Values.global.datastore.storage.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.storage.size }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-storage/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ else if and (eq .Values.global.datastore.distributed.is_set "true") (eq .Values.global.datastore.distributed.type "local-path")  }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-distributed
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-distributed
+    type: {{ .Values.global.datastore.distributed.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.distributed.size }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-distributed/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ else if and (eq .Values.global.datastore.static.is_set "true") (eq .Values.global.datastore.static.type "local-path")  }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-static
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-static
+    type: {{ .Values.global.datastore.static.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.static.size }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-static/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
