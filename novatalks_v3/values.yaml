@@ -9,17 +9,17 @@ global:
   ver_engine: &tag_engine 2023_R2_master_28e82350
   ver_botflow: &tag_botflow 2023_R2_master_f37ce65a
   #Must be changed in all config below, like a db-host, redis-host
-  project_name: &project_name ntk-dev-novait
+  project_name: &project_name ntk-dev-novait-argo
   #Namespace
-  customer_name: &customer_name dev-novait
+  customer_name: &customer_name dev-novait-argo
   #DB Connection settings
   customer_fqdn: "novait.k3s.dev.novait.com.ua"
   customer_fqdn_int: "novait.k3s.dev.novait.local"
-  db_host: &db_host ntk-dev-novait-postgres
-  #db_host: &db_host ntk-dev-novait-postgres-cluster-rw #In case of CloudNativePG
-  db_name: &db_name ntk-dev-novait-novatalks
-  db_user: &db_user ntk-dev-novait-novatalks-svc
-  redis_host: &redis_host ntk-dev-novait-redis
+  db_host: &db_host ntk-dev-novait-argo-postgres
+  #db_host: &db_host ntk-dev-novait-argo-postgres-cluster-rw #In case of CloudNativePG
+  db_name: &db_name ntk-dev-novait-argo-novatalks
+  db_user: &db_user ntk-dev-novait-argo-novatalks-svc
+  redis_host: &redis_host ntk-dev-novait-argo-redis
   redis_port: &redis_port 6379
   
   #Storage Settings
@@ -189,7 +189,7 @@ env:
   UI_SERVER_PORT: "8000"
   UI_SERVER_HOST: "0.0.0.0"
 
-  UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-engine:3000"
+  UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-argo-engine:3000"
   UI_IMPORT_CONTACTS: "true"
   UI_DELETE_CONTACT: "true"
   UI_WEBSOCKET_URL: "https://novait.k3s.dev.novait.com.ua"
