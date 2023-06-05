@@ -1,0 +1,6 @@
+dependencies:
+- name: novatalks
+  repository: https://novaittestteam.github.io/novatalks.charts/novatalks_v3/
+  version: 3.28.0
+digest: sha256:e39b0fc85bfc9fd16a40155ddb44b7ef95a67b47af3679da0d18f32fccec0b15
+generated: "2023-06-05T14:26:47.2334583+03:00"
