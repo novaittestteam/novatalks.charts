@@ -1,6 +1,6 @@
 novatalks:
   global:
     #Must be changed in all config below, like a db-host, redis-host
-    project_name: &project_name ntk-argo-novait
+    project_name: &project_name ntk-argo-novait-test
     #Namespace
     customer_name: &customer_name argo-novait
