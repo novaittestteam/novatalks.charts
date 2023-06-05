@@ -3,7 +3,7 @@ entries:
   novatalks:
   - apiVersion: v2
     appVersion: UI[2023_R2_master_1f2135fd].Engine[2023_R2_master_28e82350].BotFlow[2023_R2_master_f37ce65a]
-    created: "2023-06-05T15:18:01.5943002+03:00"
+    created: "2023-06-05T15:26:05.5050323+03:00"
     description: Novatalks Deployment from NovaIT DEV Team.
     digest: 2c5c4aee625ed729c5243a7f9f8db5be22f7a14bee73afb87a873693fa092d54
     home: https://novait.com.ua
@@ -21,6 +21,6 @@ entries:
     name: novatalks
     type: application
     urls:
-    - https://novaittestteam.github.io/novatalks.charts/helm_charts/novatalks-3.28.0.tgz
+    - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-3.28.0.tgz
     version: 3.28.0
-generated: "2023-06-05T15:18:01.584864+03:00"
+generated: "2023-06-05T15:26:05.4952763+03:00"
