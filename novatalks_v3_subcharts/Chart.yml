@@ -6,4 +6,4 @@ appVersion: "1.0.0"
 dependencies:
 - name: novatalks
   version: 3.28.0
-  repository: https://github.com/novaittestteam/novatalks.charts.git
+  repository: https://novaittestteam.github.io/novatalks.charts/novatalks_v3/
