@@ -1,5 +1,5 @@
 {{ if eq .Values.env.BF_MULTINODE_SYNC "true" }}
-{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+{{ $cred := $.Files.Get "_auth.yml" | fromYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
