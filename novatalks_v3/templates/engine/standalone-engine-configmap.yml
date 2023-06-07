@@ -1,4 +1,4 @@
-{{ $cred := $.Files.Get "templates/_auth.yml" | fromYaml }}
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -54,3 +54,5 @@ data:
   LDAP_SEARCH_ATTRIBUTES: "{{ .Values.env.ENGINE_LDAP_SEARCH_ATTRIBUTES }}"
   LDAP_CA_CERTIFICATE: "{{ .Values.env.ENGINE_LDAP_CA_CERTIFICATE }}"
   LDAP_IGNORE_CERTIFICATE: "{{ .Values.env.ENGINE_LDAP_IGNORE_CERTIFICATE }}"
+  DATABASE_PASSWORD: {{ $cred.secrets.db.pass | quote }}
+  REDIS_PASSWORD: {{ $cred.secrets.redis.pass | quote }}

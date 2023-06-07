@@ -1,5 +1,5 @@
 {{ if or (eq .Values.postgres.cnpgCluster "false") (eq .Values.postgres.cnpgMigration "true") }}
-{{ $cred := $.Files.Get "templates/_auth.yml" | fromYaml }}
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
