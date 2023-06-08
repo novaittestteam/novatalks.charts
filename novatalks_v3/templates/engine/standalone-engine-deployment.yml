@@ -45,6 +45,22 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ .Values.global.project_name }}-engine-config
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.project_name }}-postgres-secret
+                key: "password"
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.project_name }}-postgres-secret
+                key: "username"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.project_name }}-redis-secret
+                key: "password"
         image: {{ .Values.engine.image }}:{{ .Values.engine.tag }}
         imagePullPolicy: "IfNotPresent"
         args: ["npm", "run", "start:prod"]
