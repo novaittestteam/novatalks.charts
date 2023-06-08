@@ -10,6 +10,6 @@ metadata:
 data:
   POSTGRES_DB: {{ .Values.global.db_name }}
   POSTGRES_USER: {{ .Values.global.db_user }}
-  POSTGRES_PASSWORD: {{ $cred.secrets.db.pass | quote }}
-  REDIS_PASSWORD: {{ $cred.secrets.redis.pass | quote }}
+  POSTGRES_PASSWORD: {{ .Values.secrets.db.pass | quote }}
+  REDIS_PASSWORD: {{ .Values.secrets.redis.pass | quote }}
 {{ end }}

@@ -35,13 +35,13 @@ data:
                 "type": "credentials",
                 "users": [
                     {
-                        "username": "{{ $cred.secrets.botflow.admin.username }}",
-                        "password": "{{ $cred.secrets.botflow.admin.password }}",
+                        "username": "{{ .Values.secrets.botflow.admin.username }}",
+                        "password": "{{ .Values.secrets.botflow.admin.password }}",
                         "permissions": "*"
                     },
                     {
-                        "username": "{{ $cred.secrets.botflow.user.username }}",
-                        "password": "{{ $cred.secrets.botflow.user.password }}",
+                        "username": "{{ .Values.secrets.botflow.user.username }}",
+                        "password": "{{ .Values.secrets.botflow.user.password }}",
                         "permissions": "read"
                     }
                 ]
