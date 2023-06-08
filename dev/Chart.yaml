@@ -1,0 +1,11 @@
+apiVersion: v2
+name: novatalks-subchart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+dependencies:
+  - name: sub0
+    repository: file://./templates/auth.yaml
+# - name: novatalks
+#   version: ^3.35.0
+#   repository: "https://novaittestteam.github.io/novatalks.charts/helm-charts/"

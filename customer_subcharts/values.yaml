@@ -1,3 +1,13 @@
+novatalks:
+  global:
+    ver_ui: &tag_ui 2023_R2_development_f49884e5
+    ver_engine: &tag_engine 2023_R2_development_0d4b3cc7
+    ver_botflow: &tag_botflow 2023_R2_master_f37ce65a
+    #Must be changed in all config below, like a db-host, redis-host
+    project_name: &project_name ntk-dev-novait-argo
+    #Namespace
+    customer_name: &customer_name dev-novait-argo
+    
 secrets:
   botflow:
     user: 
@@ -7,7 +17,7 @@ secrets:
       username: "support@novatalks.ai"
       password: "$2b$08$XjFM1OcVwo4xh4FrRe379eC77Li25MEOkoFMj0SQOu4VoPhcSaLFm"  
   db:
-    pass: "!P@ssw0rd"
+    pass: AgAXd6aUNFpHCx3in8dHtgndZb5RtxYxmUCZJwzSsaQ0EemXu2qdJCs9/GnwuIYe1I+wz7+0NacprnnCdtOgaIb3sTxdkF45cUkrjHzgX4AiioNOy/QcWKEdnrlruQ8seYwiJmsrWTgOgGXCmu2NOmsCQYHIqM/APVDcVtJH4z/8lj+I/C5DO5cj/I/ku7XkmZOmzp4ybuITym8jEAME8idhlOXpxaeQkPbf/+IBpcy6ilyTxxj1uIIBC9q1S05IEMmOTZF5K+Bz+HdcBbzgrbxMGszpJ99//x5qXT8wNrrY9p81VGyZRfAOTizw/FabVjYCHk2puQTozEaJWW1Z0LF4uRfq0cCNFkI+ft+QtABA6VsPqubX4Zksb8vLDuaS7+LolDb2JTYFp9GDzQXn7IUE6a7c2XIAzO4wuydztkFBU8HgdDHMI6e1YyzuOYMlPF6DHIzirr7xruzC9gjeW7ioTXMdUfrcppyAdnxtt6C4DtrkBSp+Y4/BYRQmVEETz5hBag2yqtumaLT4ED3sPco72x/07Nj31Qc65ijpY22Uh4+JWKNRkV5ZVbXlabdAV744lT11Yadbd4tYPBNhTtQFpvnkcXFj5RBJz2+lPesrbavxG5pOX/I9kjPdcSkPgLfxEPQ2MUINaXhl4c11Woo4j+tmLd5o8ZH0hsMZL9JLSC9eFdb8FKYNqfVorefBChl1rwS+7iiI2CQ=
   redis:
     pass: "" 
   objectStorage: 
