@@ -276,6 +276,7 @@ secrets:
       username: "xxx"
       password: "xxx"  
   db:
+    user: xxxx
     pass: xxxxx
   redis:
     pass: "" 
