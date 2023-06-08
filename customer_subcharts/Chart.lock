@@ -1,6 +1,6 @@
 dependencies:
 - name: novatalks
   repository: https://novaittestteam.github.io/novatalks.charts/helm-charts/
-  version: 3.36.0
-digest: sha256:37f3d11aadae2d55867b9f593f713736c153f28d683bf649b0f96a2dbb4e6436
-generated: "2023-06-08T14:23:25.4605377+03:00"
+  version: 3.37.0
+digest: sha256:736a91f7db5d34f9540170097923f66c3d72bc9625f4e115bf5e2bdac612b025
+generated: "2023-06-08T14:49:25.1845573+03:00"
