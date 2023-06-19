@@ -3,6 +3,28 @@ entries:
   novatalks:
   - apiVersion: v2
     appVersion: UI[2023_R2_master_1f2135fd].Engine[2023_R2_master_28e82350].BotFlow[2023_R2_master_f37ce65a]
+    created: "2023-06-19T17:19:15.442449118Z"
+    description: Novatalks Deployment from NovaIT DEV Team.
+    digest: aa91bb0c93ce684cc8a0894130dece0b5a850d67af2dd7fe5da09e752252f5f0
+    home: https://novait.com.ua
+    icon: https://novait.com.ua/wp-content/uploads/2016/06/novait-2016-06-03-21-30-59.png
+    keywords:
+    - novatalks
+    - nova.botflow
+    - messengers
+    - novait
+    maintainers:
+    - email: aleksei.pilganchuk@novait.com.ua
+      name: Aleksei Pilganchuk
+    - email: aleksandr.topor@novait.com.ua
+      name: Alexandr Topor
+    name: novatalks
+    type: application
+    urls:
+    - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-3.41.0.tgz
+    version: 3.41.0
+  - apiVersion: v2
+    appVersion: UI[2023_R2_master_1f2135fd].Engine[2023_R2_master_28e82350].BotFlow[2023_R2_master_f37ce65a]
     created: "2023-06-08T18:01:32.6160404+03:00"
     description: Novatalks Deployment from NovaIT DEV Team.
     digest: b7b437b10d035ef43bd0cab78cd794e3ab2acc3e067a2b7653a180fe3b4fa1e2
@@ -265,4 +287,4 @@ entries:
     urls:
     - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-3.28.0.tgz
     version: 3.28.0
-generated: "2023-06-08T18:01:32.5121686+03:00"
+generated: "2023-06-19T17:19:15.438450565Z"
