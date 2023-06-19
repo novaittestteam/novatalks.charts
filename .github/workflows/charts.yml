@@ -27,6 +27,8 @@ jobs:
       - name: Prepare Release
         run: helm package ./novatalks_v3/ -d ./charts
 
+      - run: ls -la ./charts
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         with:
