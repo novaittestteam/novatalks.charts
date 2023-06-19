@@ -24,9 +24,12 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
 
+      - name: Prepare Release
+        run: helm package ./novatalks_v3/ -d ./charts
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         with:
-          charts_dir: ./novatalks_v3
+          charts_dir: ./charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
