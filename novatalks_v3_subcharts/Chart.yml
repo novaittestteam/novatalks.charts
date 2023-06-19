@@ -1,9 +1,0 @@
-apiVersion: v2
-name: novatalks-subchart
-type: application
-version: 1.0.0
-appVersion: "1.0.0"
-dependencies:
-- name: novatalks
-  version: 3.28.0
-  repository: https://github.com/novaittestteam/novatalks.charts.git
