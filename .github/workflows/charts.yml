@@ -24,15 +24,21 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
 
-      - name: Prepare Release
-        run: helm package ./novatalks_v3/ -d ./charts
+      # - name: Prepare Release
+      #   run: helm package ./novatalks_v3/ -d ./charts
 
-      - run: ls -la ./charts
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
+      # - name: Run chart-releaser
+      #   uses: helm/chart-releaser-action@v1.5.0
+      #   with:
+      #     charts_dir: ./charts
+      #   env:
+      #     CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      #     CR_SKIP_EXISTING: true
+      
+      - name: Publish Helm chart
+        uses: stefanprodan/helm-gh-pages@master
         with:
-          charts_dir: ./charts
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          CR_SKIP_EXISTING: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: novatalks_v3
+          branch: gh-pages
+          target_dir: helm-charts
