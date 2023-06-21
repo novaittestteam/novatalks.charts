@@ -1,4 +1,3 @@
-{{ if or (eq .Values.postgres.cnpgCluster "false") (eq .Values.postgres.cnpgMigration "true") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,4 +50,3 @@ spec:
         - name: {{ .Values.global.project_name }}-postgresdb
           persistentVolumeClaim:
             claimName: {{ .Values.global.project_name }}-postgres-pvc
-{{ end }}
