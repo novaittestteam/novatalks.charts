@@ -7,7 +7,24 @@ novatalks:
     project_name: &project_name ntk-dev-novait-argo
     #Namespace
     customer_name: &customer_name dev-customer-argo
-    
+  
+  nodeBind:
+    prefered: dev-01-k3sa01d.dev.novait.local
+
+  postgres:
+  replica: 1
+  sizing: small
+  resources:
+    small:
+      cpu: 150m
+      memory: 512Mi
+    medium:
+      cpu: 300m
+      memory: 1256Mi
+    large:
+      cpu: 650m
+      memory: 2048Mi
+
   secrets:
     botflow:
       user: 
