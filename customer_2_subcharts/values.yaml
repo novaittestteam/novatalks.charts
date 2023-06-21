@@ -1,0 +1,77 @@
+novatalks:
+  global:
+    ver_ui: &tag_ui 2023_R2_development_f49884e5
+    ver_engine: &tag_engine 2023_R2_development_0d4b3cc7
+    ver_botflow: &tag_botflow 2023_R2_master_f37ce65a
+    #Must be changed in all config below, like a db-host, redis-host
+    project_name: &project_name ntk-dev-novait-argo
+    #Namespace
+    customer_name: &customer_name dev-customer-argo
+    
+  secrets:
+    botflow:
+      user: 
+        username: "presales@novait.com.ua"
+        password: "$2b$08$2FaplJ0bd5pbrmLJL4AiMuCg8Io2.IIJF8vr3F08/hDyFsK2rWbGO"
+      admin:
+        username: "support@novatalks.ai"
+        password: "$2b$08$XjFM1OcVwo4xh4FrRe379eC77Li25MEOkoFMj0SQOu4VoPhcSaLFm"  
+    db:
+      user: AgCDoVQGPN6Qf4hAZk5PaIYavYbmqtRUjie+DSvL6yx4P9sFE8U0dn9hJeDljSInSML2AjrwjJ9YL0zGJzuW1p6OBuwQ0zEgWepP+BnnA7IgX+C29BNmodfUdvkm4V8/2fKXFXHVnDlXN8eK7rx2rhjTeyIyhh6eTb26PNRNfpiU786+eYvgwz3bgoc2FZY6TRyIPplDGrkh4WOkf/UWFFcWTTNIoJCHs/HvO5BRolfngPBITwPFmdP8ZqIklYDWRO2AbmZtKjzpY1woBZh6fWu6g4kYX1ENsxekLvdGZAch3YZWKclUyfg4DCCGmXzR0FAb89TwF/31dRF0TfSj88l+gSuSWc0VClGRMUgdXWp3E1IIJyUKWE5XGrqY1rdQsxS9iXhz07po02sdnxcmRjjZruoq/NgU0a2zFRTZk91TcwkofVpT31zLP/lLViiAMQYerCOTp9M/nAqtiFDztrFaR4UARB+cXOpUBlwfFZQX99mpctfNSySRPuOVvnL7BvKrk2dpWCyGt4I/xhgywqK7bcW7uhL/++smG0yKOQt62UNrS4CL64GaNQUSojcjlCth0WAb671ouny9GKIkQh9tZLLVYTdxMHgVRFhiuHuy5pwxIJbRtbsMu+pGIfFvv8/6vtsLBagZjB18fa+swEUD7GSz6CNMCxGgrdxAPzGqnn30H0ojgyd/Wv0ypI0A39cYAL6LK+AqjaSaolc4Qn/+9cDjNWwedq6K1KndTnuhh20=
+      pass: AgA60pGJ1yEey/jav/IFZ6rYhwoqscJHhxqGV3umzcsBQEXhJA0Zzt3as7Q6HW4tCyVVgKurzQLpgFh1NpeXBzLvXhjf6NvHqDPpH9P3K7rTKrAgbLTsF5IIofSKtbR4UktTiSCyKk2qARqsfognsqfBQ1kIsR934m/Rsp3473fztd0fiAX3l0UiqiVcHj0KUtal/IFDKzXPjmHsU5NlXVlI+O5xhxQ01lchpgzvoQlx6ZthRuxQZQCRaDnJEvo7xc/AAB6MnigS7k2B5Ocz2i/2tbERiBAh2DCfQV4KiZEodrrTZ8p5adHsIa7CmgyR8eJKkBZ6haGIQ+5XnokdutDwh7o/kkP9fK9OI4sMRN5gtVb2BHf+bOjg0m5gRZjyPrnAeJ2I7OAeUlu16RkKLHBS1atmoYN/kXThXhn7HkB6BYaAsYhj1QFMi8Drt3F0bdiGScW8+NjbGY/2OMXpux7sNEEnVk1EZJ2z3U5n9/risxYexCG3CJINVOX4z2ASSRdaJ1Udi0I/0wxVqtQyigmyKyZ6XU+Eh+KYG//rikpHbJqZyG+IIBLE6RYG8buzoFPTkwPFAoO949R/1Ak5Ai742sh0DOwSL0SXjfSWbsMwtVUn21ldJlg2XKCnpgvghrBRSXJ7ZISi8wRaBoec0lMO4O7FUxaPCat03x6lD4pOG9+BT3ZMKr2c/E0WWvj4OIdvATi3MbUrMg==
+    redis:
+      pass: AgBwJ4+eSpPjMJM4tdGiOG0SX1BFt5C7HlQk+GK5fGdPuQvDHH8ncW1a1FgzIT7SFswDa6kcu6Pcn6SpNJxTocOwejw/kqUbH+iEM2zsQiLUuYRjo7POCZyCT4vZQzLrjEoJ2RdEBvhEV12HS8+8V0q0gCdh3cL9oYktu7jXLcGDbfvJRamaMmSAkcbiy1Zt0XBScxLmrjkzmCU316y+Sqhcrzs+8g6HP06QOEWnmee+QNrXYICyRyLQEsqc6LuG8AhF4McMQEryUtDtre7w64LFXyw7YEFzA+lPhBHBLkUHSnVhVH11fsxxdJuOZCg66z1wCtYw92CL7ywMfq6EsM2Gnk6WKbyrQ6crdT3boiiMpSXg+I2ZnCoX2P6AJg/1D4JqKe7oDWbfvDAWmFRFIjBtENLfzpjdna3z1l/kkEZ30OZNGit6vJcgV2N18WijoM4wtelAnC4w/BNZWaUMPhnpgd3mJ+y2IXUkM61nusw0otfkNODfD73DdJX93qQ6OZTZvWn1vt+5evp/pdqVNjBy5Mr7zmyabMsr06u6Ns2XbU6SCGbpUvhZklm8rvQt8Wbm4oEMqODuk+tLqmN61FnY3xxeM289A8Km0jpvcDoVlZRvMl5VZgawZbu0NiDGjZGQf6SxteKQZ+6iyVRR62MPKmJ3xMk19Bg/qwJqmrbcdDwS/a/lLbEyMDuWVIa3Suo=
+    objectStorage: 
+      AccessKeyID: "dev-01d-lngh-backup"
+      AccessKey: "AmxR5YDjgY7eqSrO5b5B9Wi2ZxTjkYXi"
+      CA: |
+        -----BEGIN CERTIFICATE-----
+        MIIELDCCAxSgAwIBAgIBADANBgkqhkiG9w0BAQsFADBsMRcwFQYDVQQDEw5ub3Zh
+        aXQtcm9vdC1jYTELMAkGA1UEBhMCVUExDTALBgNVBAgTBEt5aXYxDTALBgNVBAcT
+        BEt5aXYxFDASBgNVBAoTC05vdmEgSVQgTExDMRAwDgYDVQQLEwdDb21wYW55MCAX
+        DTIwMDkyMTE3MDMwMFoYDzIwNzAwOTA5MTcwMzAwWjBsMRcwFQYDVQQDEw5ub3Zh
+        aXQtcm9vdC1jYTELMAkGA1UEBhMCVUExDTALBgNVBAgTBEt5aXYxDTALBgNVBAcT
+        BEt5aXYxFDASBgNVBAoTC05vdmEgSVQgTExDMRAwDgYDVQQLEwdDb21wYW55MIIB
+        IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3dRzNZKHf1li0mJy9SLkAUD4
+        s1m8UrFW+opa+Q+j5UDe057ARwFST9kvQ9XCMMiHBIFEl9gu38mn2FboSf9KTJST
+        dw99DB1mbNbQ7hCdgGUGUjPTcwxAQBySdhRsfuvqlWho5Jw9zB4/N2u8DmHQsVZH
+        C8h66073uj46dAGSwgO72mYxqbUJR7GVm/h9eGvt3+vnaiAzcKO/C9dRYpzhfYqh
+        +znHkm/VKmxUWUf3HpWSZOFFgWakcaLuyuNA9OWX8szFELWDdTgL1Sq4CxHZ/Zzb
+        PeVMRVYEsVAwmyzjfszOexvSW/jpRxlXi1R5W5OnXLyoiOmEdhiTcy+TYWN7jwID
+        AQABo4HWMIHTMB0GA1UdDgQWBBQ/9ExCFfrFV9x4Glfp92hUIVyZxDCBlgYDVR0j
+        BIGOMIGLgBQ/9ExCFfrFV9x4Glfp92hUIVyZxKFwpG4wbDEXMBUGA1UEAxMObm92
+        YWl0LXJvb3QtY2ExCzAJBgNVBAYTAlVBMQ0wCwYDVQQIEwRLeWl2MQ0wCwYDVQQH
+        EwRLeWl2MRQwEgYDVQQKEwtOb3ZhIElUIExMQzEQMA4GA1UECxMHQ29tcGFueYIB
+        ADAMBgNVHRMEBTADAQH/MAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEA
+        XH/kcYJJ1w8Jbw1MDLRMppZ8E6NS9sa0q0l3P/XYbkJi0Jxa4d9uOO0uXQLZ6Rjr
+        BUc3XmD4EK0H5YXPTg+39dETLWNgdQG9pTwgMd77tfb98ZXwfZR6QSrlD/VjaLmb
+        OaL6/WLyBhcDROKu97hwtDbL79Ws14PiurwK1e4q3kB40rb2IWf6Rpgci/9WsC9m
+        F4ZY1dR6m75vwPlF4YmxFgyomZodLpRNjrpLG0IEqgA/CLeuMtLSLsyQCuJXeAbl
+        YBheKzECHHkhZ7oxjOoPZal+3lp0scQFwtcg/aFUEnXOh+pZ8MztVjPJ+zLOR8xE
+        vEBbqW7ksuOFJwQqzXKkKQ==
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        MIIEQTCCAymgAwIBAgIBATANBgkqhkiG9w0BAQsFADBsMRcwFQYDVQQDEw5ub3Zh
+        aXQtcm9vdC1jYTELMAkGA1UEBhMCVUExDTALBgNVBAgTBEt5aXYxDTALBgNVBAcT
+        BEt5aXYxFDASBgNVBAoTC05vdmEgSVQgTExDMRAwDgYDVQQLEwdDb21wYW55MCAX
+        DTIwMDkyMTE3MDU0MloYDzIwNzAwOTA5MTcwNTQyWjCBgDEcMBoGA1UEAxMTbm92
+        YWl0LWxvY2FsLWltZC1jYTELMAkGA1UEBhMCVUExDTALBgNVBAgTBEt5aXYxDTAL
+        BgNVBAcTBEt5aXYxFDASBgNVBAoTC05vdmEgSVQgTExDMR8wHQYDVQQLExZDb3Jw
+        b3JhdGUgTG9jYWwgRG9tYWluMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+        AQEA27JFxLw75Rykd50ai7Xan5+3VnHaZ/auDmATObujEsmbIrBlyMdlnFUtLW6q
+        5bVJ/WLEaGnake+1O788H0EJXj5ReH7BiOHG+JPveEy3PSpBFDgbSanqlurtiS14
+        hJmpv8VraVHKHJ5lJv62l/RfVCpAfH6eVixbP08DRI0i4hoPES4RNrWssiTLYvU6
+        quUUo7Oo/VnS1PE/WmPjqu+5TTkkP23Z1vTrvauGCZx3tMqJiWs5inIvdPaV9+yh
+        zxrR20m9GwVpKu/Fe21wc8yodAas8vit23oMyzs33FBvHf9OrIo51zFnLN58iibH
+        ifyzA2apV5mFHu6dVYnRrp2z0wIDAQABo4HWMIHTMB0GA1UdDgQWBBRJFH3Vvr2L
+        0PT4F5TJDufqIyf6+jCBlgYDVR0jBIGOMIGLgBQ/9ExCFfrFV9x4Glfp92hUIVyZ
+        xKFwpG4wbDEXMBUGA1UEAxMObm92YWl0LXJvb3QtY2ExCzAJBgNVBAYTAlVBMQ0w
+        CwYDVQQIEwRLeWl2MQ0wCwYDVQQHEwRLeWl2MRQwEgYDVQQKEwtOb3ZhIElUIExM
+        QzEQMA4GA1UECxMHQ29tcGFueYIBADAMBgNVHRMEBTADAQH/MAsGA1UdDwQEAwIB
+        BjANBgkqhkiG9w0BAQsFAAOCAQEAnWyZkH2Sb4trXEJra+K99Wdy9bRpiuUMSzN+
+        LMVWXjiDCwbvmyA4EKDWXGSR+OmTi14YSyP7jZEWMXdXMO0i8zmlkDIagK3hCAxj
+        t2sFl6SzTuhXb35lzOtGTtlGtwS4+LP5Dhrd+HcH4mRv03KGZJ+QTfDoSzDccrFC
+        AjMeaIEKdClJEY+smgOSjd0ahI1DF5FdcPrO9NjHo5jt5Lr4jthu9JJiQvze7Jal
+        jYyUVMM3xvAgkzJjII9hcGqOtDmoNgHYD3QR7AJLEiqcfGRjxmPmG2aSp4w5InTs
+        Bdp8030GeEN5E+es3x5Z2XZi9wzGpahwNbO5El9rJZeLCTQ6ww==
+        -----END CERTIFICATE-----
