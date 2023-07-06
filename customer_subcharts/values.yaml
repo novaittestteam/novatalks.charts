@@ -7,7 +7,11 @@ novatalks:
     project_name: &project_name ntk-dev-novait-argo
     #Namespace
     customer_name: &customer_name dev-novait-argo
-    
+
+  botflow:
+    tag: 2023_R3_fix-bot-chat-setting_e178c96f
+
+
   secrets:
     botflow:
       user: 
