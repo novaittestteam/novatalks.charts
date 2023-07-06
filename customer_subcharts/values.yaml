@@ -1,6 +1,6 @@
 novatalks:
   global:
-    ver_ui: &tag_ui 2023_R2_master_e1a22404
+    ver_ui: &tag_ui 2023_R3_NC2-662_ea0fc0df
     ver_engine: &tag_engine 2023_R2_development_0d4b3cc7
     ver_botflow: &tag_botflow 2023_R3_master_6b8ac7cf
     #Must be changed in all config below, like a db-host, redis-host
