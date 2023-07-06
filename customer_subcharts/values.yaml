@@ -10,6 +10,8 @@ novatalks:
 
   botflow:
     tag: 2023_R3_fix-bot-chat-setting_e178c96f
+  ui:
+    tag: 2023_R3_NC2-662_ea0fc0df
 
 
   secrets:
