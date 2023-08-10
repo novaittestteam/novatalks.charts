@@ -3,6 +3,28 @@ entries:
   novatalks:
   - apiVersion: v2
     appVersion: UI[2023_R3_master_d613e0b1].Engine[2023_R3_master_63ac256b].BotFlow[2023_R3_master_6b8ac7cf]
+    created: "2023-08-10T12:40:35.130875313Z"
+    description: Novatalks Deployment from NovaIT DEV Team.
+    digest: 120dfda70566a55dba0320091188c56cc1d231ddf4f84ce33fbcecf08447e4f3
+    home: https://novait.com.ua
+    icon: https://novait.com.ua/wp-content/uploads/2016/06/novait-2016-06-03-21-30-59.png
+    keywords:
+    - novatalks
+    - nova.botflow
+    - messengers
+    - novait
+    maintainers:
+    - email: aleksei.pilganchuk@novait.com.ua
+      name: Aleksei Pilganchuk
+    - email: aleksandr.topor@novait.com.ua
+      name: Alexandr Topor
+    name: novatalks
+    type: application
+    urls:
+    - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-4.12.0.tgz
+    version: 4.12.0
+  - apiVersion: v2
+    appVersion: UI[2023_R3_master_d613e0b1].Engine[2023_R3_master_63ac256b].BotFlow[2023_R3_master_6b8ac7cf]
     created: "2023-08-10T12:33:03.81450616Z"
     description: Novatalks Deployment from NovaIT DEV Team.
     digest: 000912f7b54a1626d10171002130d69d7051e22683bd930270e06219047bc379
@@ -47,9 +69,9 @@ entries:
     version: 4.10.0
   - apiVersion: v2
     appVersion: UI[2023_R2_master_1f2135fd].Engine[2023_R2_master_28e82350].BotFlow[2023_R2_master_f37ce65a]
-    created: "2023-08-10T12:33:03.732312299Z"
+    created: "2023-08-10T12:40:35.129374135Z"
     description: Novatalks Deployment from NovaIT DEV Team.
-    digest: cfc9e4df5ab45e7318b7c45fdc258dd7d1974be8d2ea08c7fc4a1b1187945394
+    digest: bddc0b28fcdc2d603dce79924f9cb83108f4385ad10be4ad1fe6ebbd28def334
     home: https://novait.com.ua
     icon: https://novait.com.ua/wp-content/uploads/2016/06/novait-2016-06-03-21-30-59.png
     keywords:
@@ -331,4 +353,4 @@ entries:
     urls:
     - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-3.28.0.tgz
     version: 3.28.0
-generated: "2023-08-10T12:33:03.728282768Z"
+generated: "2023-08-10T12:40:35.12611749Z"
