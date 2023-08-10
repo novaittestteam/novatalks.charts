@@ -31,15 +31,21 @@ spec:
         args:
           - -c
           - >-
-            PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+            PG_READY="pg_isready -h $DATABASE_HOST -p 5432";
             until $PG_READY;
             do
               sleep 2;
             done;
             echo "Database ready to accept connections."  ;
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-engine-config
       - name: init-redis
         image: busybox:1.28
-        command: ["sh", "-c", "until nslookup {{ .Values.global.redis_host }} ; do echo waiting for {{ .Values.global.redis_port }} ; sleep 2; done;"]     
+        command: ["sh", "-c", "until nslookup $REDIS_HOST ; do echo waiting for $REDIS_PORT; sleep 2; done;"]
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.project_name }}-engine-config    
       containers:
       - name: {{ .Values.global.project_name }}-engine
         envFrom:
