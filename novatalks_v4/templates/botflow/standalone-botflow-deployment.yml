@@ -40,7 +40,7 @@ spec:
           - >-
             apk update;
             apk add curl;
-            until [ "$(curl -s -w '%{http_code}' -o /dev/null "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST}}/auth/validate_token")" -eq 401 ];
+            until [ "$(curl -s -w '%{http_code}' -o /dev/null "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST | default (printf "http://%s-engine:%v" .Values.global.project_name .Values.engine.servicePort) }}/auth/validate_token")" -eq 401 ];
             do
               sleep 10;
             done;
