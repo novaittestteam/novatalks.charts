@@ -3,6 +3,28 @@ entries:
   novatalks:
   - apiVersion: v2
     appVersion: UI[2023_R3_master_d613e0b1].Engine[2023_R3_master_63ac256b].BotFlow[2023_R3_master_6b8ac7cf]
+    created: "2023-08-10T13:19:33.115970261Z"
+    description: Novatalks Deployment from NovaIT DEV Team.
+    digest: a40b96553ec1e474625ae5d0eb56c6b1e8feb2415611b96fbab570c773deea84
+    home: https://novait.com.ua
+    icon: https://novait.com.ua/wp-content/uploads/2016/06/novait-2016-06-03-21-30-59.png
+    keywords:
+    - novatalks
+    - nova.botflow
+    - messengers
+    - novait
+    maintainers:
+    - email: aleksei.pilganchuk@novait.com.ua
+      name: Aleksei Pilganchuk
+    - email: aleksandr.topor@novait.com.ua
+      name: Alexandr Topor
+    name: novatalks
+    type: application
+    urls:
+    - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-4.14.0.tgz
+    version: 4.14.0
+  - apiVersion: v2
+    appVersion: UI[2023_R3_master_d613e0b1].Engine[2023_R3_master_63ac256b].BotFlow[2023_R3_master_6b8ac7cf]
     created: "2023-08-10T12:59:02.228252266Z"
     description: Novatalks Deployment from NovaIT DEV Team.
     digest: 32cd2d321d23f9cfe549f9ba7dc189c71b72b9bab8adb472088f94c9c0de5af5
@@ -91,9 +113,9 @@ entries:
     version: 4.10.0
   - apiVersion: v2
     appVersion: UI[2023_R2_master_1f2135fd].Engine[2023_R2_master_28e82350].BotFlow[2023_R2_master_f37ce65a]
-    created: "2023-08-10T12:59:02.226317482Z"
+    created: "2023-08-10T13:19:33.114386087Z"
     description: Novatalks Deployment from NovaIT DEV Team.
-    digest: db01d6d7e5d82be88f325ee2998f3e90ecd85c5491002f141252ddc4ad17f690
+    digest: 1f923d6088fd1ecccead950671cb7c66e317fd9251b3b264a5c8858ada2aa0ae
     home: https://novait.com.ua
     icon: https://novait.com.ua/wp-content/uploads/2016/06/novait-2016-06-03-21-30-59.png
     keywords:
@@ -375,4 +397,4 @@ entries:
     urls:
     - https://novaittestteam.github.io/novatalks.charts/helm-charts/novatalks-3.28.0.tgz
     version: 3.28.0
-generated: "2023-08-10T12:59:02.222487677Z"
+generated: "2023-08-10T13:19:33.031784083Z"
