@@ -208,7 +208,7 @@ env:
   UI_SERVER_PORT: "8000"
   UI_SERVER_HOST: "0.0.0.0"
 
-  UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-engine:3000"
+  # UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-engine:3000"
   UI_IMPORT_CONTACTS: "true"
   UI_DELETE_CONTACT: "false"
   UI_WEBSOCKET_URL: "https://novait.k3s.dev.novait.com.ua"

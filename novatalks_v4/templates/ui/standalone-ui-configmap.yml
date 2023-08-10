@@ -8,7 +8,7 @@ metadata:
 data:
   SERVER_PORT: "{{ .Values.env.UI_SERVER_PORT }}"
   SERVER_HOST: "{{ .Values.env.UI_SERVER_HOST }}"
-  NOVA_CHATS_ENGINE_HOST: "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST }}"
+  NOVA_CHATS_ENGINE_HOST: "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST | default (printf "http://%s-engine:%v" .Values.global.project_name .Values.engine.servicePort) }}"
   WIDGET_SOURCE_HOST: "{{ .Values.env.UI_WIDGET_SOURCE_HOST }}"
   IMPORT_CONTACTS: "{{ .Values.env.UI_IMPORT_CONTACTS }}"
   DELETE_CONTACT: "{{ .Values.env.UI_DELETE_CONTACT }}"
