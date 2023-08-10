@@ -1,0 +1,116 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.global.project_name }}-public-route-https
+  namespace: ingress-gateways
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-ui
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.ui.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/redbot`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-botflow
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.botflow.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/store/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/api/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/auth/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/ws`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/widget`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  {{- include "getAdditionalRoutes" ( list $ $.Values.global.additionalBotflowRoutes ) }}
+  tls:
+    secretName: {{ .Values.global.project_name }}-tls-cert
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.global.project_name }}-internal-route-https
+  namespace: ingress-gateways
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`{{ .Values.global.customer_fqdn_int }}`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-ui
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.ui.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn_int }}`) && PathPrefix(`/redbot`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-botflow
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.botflow.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn_int }}`) && PathPrefix(`/swagger-stats`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.engine.servicePort }}
+  tls:
+    secretName: wildcard-k3s-dev-novait-local-tls-cert 
+
+---    
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.global.project_name }}-public-route-http
+  namespace: ingress-gateways
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-ui
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.ui.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/redbot`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-botflow
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.botflow.servicePort }}
+  - match: Host(`{{ .Values.global.customer_fqdn }}`) && PathPrefix(`/ws`)
+    kind: Rule
+    services:
+    - name: {{ .Values.global.project_name }}-engine
+      namespace: {{ .Values.global.customer_name }}
+      port: {{ .Values.botflow.servicePort }}

@@ -40,6 +40,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           #charts_dir: ./novatalks_v3
-          charts_dir: .
+          charts_dir: ./novatalks_v4
           branch: gh-pages
           target_dir: helm-charts

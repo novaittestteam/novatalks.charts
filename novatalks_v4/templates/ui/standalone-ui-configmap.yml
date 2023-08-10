@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-ui-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-ui
+data:
+  SERVER_PORT: "{{ .Values.env.UI_SERVER_PORT }}"
+  SERVER_HOST: "{{ .Values.env.UI_SERVER_HOST }}"
+  NOVA_CHATS_ENGINE_HOST: "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST }}"
+  WIDGET_SOURCE_HOST: "{{ .Values.env.UI_WIDGET_SOURCE_HOST }}"
+  IMPORT_CONTACTS: "{{ .Values.env.UI_IMPORT_CONTACTS }}"
+  DELETE_CONTACT: "{{ .Values.env.UI_DELETE_CONTACT }}"
+  WEBSOCKET_URL: "{{ .Values.env.UI_WEBSOCKET_URL }}"
+  REFRESH_REPORT_INTERVAL: "{{ .Values.env.UI_REFRESH_REPORT_INTERVAL }}"
+  PRESENCE_INTERVAL: "{{ .Values.env.UI_PRESENCE_INTERVAL }}"
+  MESSAGE_DYNAMIC_TIME: "{{ .Values.env.UI_MESSAGE_DYNAMIC_TIME }}"
+  VAPID_PUBLIC_KEY: "{{ .Values.env.UI_VAPID_PUBLIC_KEY }}"
+  VUE_PRODUCTION_TIP: "{{ .Values.env.UI_VUE_PRODUCTION_TIP }}"
+  VUE_DEVTOOLS: "{{ .Values.env.UI_VUE_DEVTOOLS }}"
+  PINNED_MESSAGES_LIMIT: "{{ .Values.env.UI_PINNED_MESSAGES_LIMIT }}"
+  CONVERSATION_LIST_LIMIT: "{{ .Values.env.UI_CONVERSATION_LIST_LIMIT}}"
+  NODE_TLS_REJECT_UNAUTHORIZED: "{{ .Values.env.UI_NODE_TLS_REJECT_UNAUTHORIZED }}"

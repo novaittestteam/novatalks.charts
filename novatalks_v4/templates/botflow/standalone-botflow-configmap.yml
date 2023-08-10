@@ -1,0 +1,120 @@
+{{ if eq .Values.env.BF_MULTINODE_SYNC "false" }}
+{{ $cred := $.Files.Get "config/auth.yml" | fromYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-botflow-config
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+data:
+  settings.js: |
+    const log4js = require('log4js')
+    log4js.configure({ 
+        appenders: {
+            file: {
+                type: 'file',
+                filename: '/var/log/nova.botflow/botflow.log',
+                maxLogSize: 52428800, 
+                backups: 5,
+                compress: true,
+                keepFileExt: true
+            }
+        },
+        categories: {
+            default: {appenders: ['file'], level:'trace'}
+        }
+    });
+    const logger = log4js.getLogger('nova');
+    module.exports = {
+            flowFile: "flows.json",
+            credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET || false,
+            flowFilePretty: true,
+            userDir: './userdata',
+            adminAuth: {
+                "type": "credentials",
+                "users": [
+                    {
+                        "username": "{{ .Values.secrets.botflow.admin.username }}",
+                        "password": "{{ .Values.secrets.botflow.admin.password }}",
+                        "permissions": "*"
+                    },
+                    {
+                        "username": "{{ .Values.secrets.botflow.user.username }}",
+                        "password": "{{ .Values.secrets.botflow.user.password }}",
+                        "permissions": "read"
+                    }
+                ]
+            },
+            uiPort: process.env.PORT || 1880,
+            httpAdminRoot: '/redbot',
+            logging: {
+                console: {
+                    level: "info",
+                    metrics: false,
+                    audit: false
+                },
+                log4js: {
+                    level: 'trace',
+                    metrics: false,
+                    audit: true,
+                    handler: function(settings) {
+                        return function(msg) {
+                            const message = JSON.stringify(msg);
+                            switch (msg.level) {
+                                    case 10: 
+                                        logger.fatal(message); 
+                                        break;
+                                    case 20: 
+                                        logger.error(message); 
+                                        break;
+                                    case 30: 
+                                        logger.warn(message); 
+                                        break;
+                                    case 50: 
+                                        logger.debug(message); 
+                                        break;
+                                    case 40:     
+                                    case 98: 
+                                    case 99: 
+                                        logger.info(message); 
+                                        break;
+                                    default: 
+                                        logger.trace(message);                       
+                            }
+                        }
+                    }
+                }
+              },
+              contextStorage: {
+                  default: "file",
+                  memoryOnly: { module: 'memory' },
+                  file: { module: 'localfilesystem' }
+              },
+              exportGlobalContextKeys: false,
+              externalModules: {
+              },
+              editorTheme: {
+                  palette: {
+                  },
+                  projects: {
+                      enabled: false,
+                      workflow: {
+                          mode: "manual"
+                      }
+                  },
+                  codeEditor: {
+                      lib: "monaco",
+                      options: {
+                          theme: "vs",
+                      }
+                  }
+              },
+              functionExternalModules: true,
+              functionGlobalContext: {
+              },
+              debugMaxLength: 1000,
+              mqttReconnectTime: 15000,
+              serialReconnectTime: 15000,
+      }
+{{ end }}

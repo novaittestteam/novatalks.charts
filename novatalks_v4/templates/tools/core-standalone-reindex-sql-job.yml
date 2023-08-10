@@ -1,0 +1,95 @@
+{{ if eq .Values.postgres.jobReindexEnabled "true" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.project_name }}-sql-reindex-query
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-sql-reindex-query
+data:
+  reindex-biggest-tables.sql: |
+    SELECT current_database();
+    REINDEX (VERBOSE) TABLE CONCURRENTLY contacts;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY contact_inboxes;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY conversations;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY notifications;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY storage_attachments;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY storage_blobs;
+    SELECT pg_sleep(2);
+    REINDEX (VERBOSE) TABLE CONCURRENTLY messages;
+
+---    
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-maintenance-reindex--job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-maintenance-reindex--job
+spec:
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  schedule: {{.Values.postgres.jobReindexSchedule }}
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - ntk-01-k3ss01.novatalks.local
+                          - ntk-02-k3ss01.novatalks.local
+                          - ntk-03-k3ss01.novatalks.local
+                          - dev-01-k3ss01d.dev.novait.local
+          restartPolicy: Never
+          initContainers:
+          - name: check-postgres
+            image: {{ .Values.postgres.image }}
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: run-sql-script
+            image: {{ .Values.postgres.image }}
+            command: [ "bin/sh", "-c", "PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -a -f /tmp/reindex-biggest-tables.sql" ]
+            env:
+              - name: POSTGRES_DB
+                value: {{ .Values.global.db_name }}
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-postgres-secret
+                    key: "password"
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-postgres-secret
+                    key: "username"
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-db-script
+              mountPath: /tmp/reindex-biggest-tables.sql
+              subPath: "reindex-biggest-tables.sql"
+          volumes:
+          - name: {{ .Values.global.project_name }}-db-script
+            configMap:
+              name: {{ .Values.global.project_name }}-sql-reindex-query
+{{ end }}

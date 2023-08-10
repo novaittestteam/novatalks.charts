@@ -1,0 +1,172 @@
+{{ if eq .Values.postgres.jobBackupEnabled "true" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-shared-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-shared
+    type: backup
+    cost: medium
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  storageClassName: local-path
+  volumeName: {{ .Values.global.project_name }}-pv-shared
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-shared
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-shared
+    type: backup
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/ntk-storage/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.global.project_name }}-backup-postgres-job
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-backup-postgres-job
+spec:
+  schedule: {{.Values.postgres.jobBackupSchedule }}
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:        
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - ntk-01-k3ss01.novatalks.local
+                          - ntk-02-k3ss01.novatalks.local
+                          - ntk-03-k3ss01.novatalks.local
+                          - dev-01-k3ss01d.dev.novait.local
+          restartPolicy: Never
+          initContainers:
+          - name: init-postgres
+            image: {{ .Values.postgres.image }}
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >-
+                PG_READY="pg_isready -h {{ .Values.global.db_host }} -p 5432";
+                until $PG_READY;
+                do
+                  sleep 2;
+                done;
+                echo "Database ready to accept connections."  ;
+          containers:
+          - name: "dump-job"
+            image: {{ .Values.postgres.image }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - >-
+                echo "Starting Backup..";
+                mkdir -p /tmp/pgdump/{{ .Values.global.project_name }}/$(date +%Y-%m-%d)/postgres/;
+                export PGPASSWORD=$POSTGRES_PASSWORD;
+                pg_dump -Fc -U $POSTGRES_USER -d $POSTGRES_DB -h {{ .Values.global.db_host }} -p 5432 -v > /tmp/pgdump/{{ .Values.global.project_name }}/$(date +%Y-%m-%d)/postgres/{{ .Values.global.project_name }}_${POSTGRES_DB}_$(date +%Y-%m-%dT%H:%M:%S).gz;          
+                if [ $? -eq 0 ];
+                then
+                  echo "Backup Completed";            
+                  exit 0;
+                else
+                  echo "PGdump failed";
+                  exit 1;
+                fi; 
+            env:
+              - name: POSTGRES_DB
+                value: {{ .Values.global.db_name }}
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-postgres-secret
+                    key: "password"
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-postgres-secret
+                    key: "username"
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-shared-data
+              mountPath: /tmp
+              subPath: ./job-backup
+          {{ if eq .Values.postgres.jobToS3 "true" }}
+          - name: "aws-cli-upload-job"
+            image: amazon/aws-cli:latest
+            imagePullPolicy: Always
+            command: ["/bin/sh","-c"]
+            args:
+              - >-
+                aws $ENDPOINT_URL $VERIFY_SSL s3 cp /tmp/pgdump/ $BUCKET --recursive;
+                if [ $? -eq 0 ];
+                then
+                  echo "Upload completed";
+                  sleep 1;
+                  echo "Cleaning...";
+                  rm -rf /tmp/pgdump/{{ .Values.global.project_name }}/$(date +%Y-%m-%d) -v;
+                  echo "Done";
+                  exit 0;
+                else
+                  echo "Upload failed";
+                  exit 1;
+                fi;
+            env:
+              - name: AWS_DEFAULT_REGION
+                value: "us-east-1"
+              - name: AWS_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-s3-secret
+                    key: "secretAccessKeyID"
+              - name: AWS_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .Values.global.project_name }}-s3-secret
+                    key: "secretAccessKey"
+              - name: ENDPOINT_URL
+                value: "--endpoint-url https://minio-ntk-prod-tenant.nsm.novait.local"
+              - name: VERIFY_SSL
+                value: "--no-verify-ssl"
+              - name: BUCKET
+                value: {{ .Values.postgres.cnpgClusterBackupPath }}
+            volumeMounts:
+            - name: {{ .Values.global.project_name }}-shared-data
+              mountPath: /tmp
+              subPath: ./job-backup
+          {{ end }}
+          volumes:
+          - name: {{ .Values.global.project_name }}-shared-data
+            persistentVolumeClaim:
+              claimName: {{ .Values.global.project_name }}-shared-pvc
+{{ end }}
+          

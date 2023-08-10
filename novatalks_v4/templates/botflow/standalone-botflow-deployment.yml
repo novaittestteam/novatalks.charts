@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-botflow
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+spec:
+  replicas: {{ int .Values.botflow.replica }}
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-botflow
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.global.project_name }}-botflow
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values:
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoExecute"
+      initContainers:
+      - name: check-ntk-core
+        image: alpine:latest
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+            apk update;
+            apk add curl;
+            until [ "$(curl -s -w '%{http_code}' -o /dev/null "{{ .Values.env.UI_NOVA_CHATS_ENGINE_HOST}}/auth/validate_token")" -eq 401 ];
+            do
+              sleep 10;
+            done;
+            echo "Engine API ready";
+      containers:
+      - env:
+        - name: NODE_ENV
+          value: production
+        - name: NODE_RED_CREDENTIAL_SECRET
+          value: "{{ .Values.env.BF_NODE_RED_CREDENTIAL_SECRET }}"
+        - name: MESSAGE_ID_PREFIX
+          value: "{{ .Values.env.BF_MESSAGE_ID_PREFIX }}"
+        - name: MESSAGE_ID_EX_TIME
+          value: "{{ .Values.env.BF_MESSAGE_ID_EX_TIME }}"
+        - name: NODE_RED_OPTIONS
+          value: '"-s /opt/nova.botflow/config/settings.js"' #If you need some settings change this path to mounted follder {{ .Values.global.project_name }}-botflow-conf
+        - name: MESSAGE_MAX_SIZE_TG_BOT
+          value: "3992"
+        - name: MESSAGE_MAX_SIZE_VIBER
+          value: "3992"
+        - name: MESSAGE_MAX_SIZE_WHATSAPP_BUSINESS
+          value: "3992"
+        - name: MESSAGE_MAX_SIZE_FACEBOOK
+          value: "2000"
+        - name: MESSAGE_MAX_SIZE_INSTAGRAM
+          value: "998"
+        {{ if eq .Values.env.BF_MULTINODE_SYNC "true" }}
+        - name: BF_MULTINODE_SYNC
+          value: "{{ .Values.env.BF_MULTINODE_SYNC}}"
+        - name: BF_CONFIG_STORAGE_TYPE
+          value: "{{ .Values.env.BF_CONFIG_STORAGE_TYPE}}"
+        - name: BF_REDIS_HOST
+          value: "{{ .Values.env.BF_REDIS_HOST}}"
+        - name: BF_REDIS_PORT
+          value: "{{ .Values.env.BF_REDIS_PORT}}"
+        - name: BF_REDIS_DB
+          value: "{{ .Values.env.BF_REDIS_DB}}"
+        #- name: BF_REDIS_PASSWORD
+        #  value: "{{ .Values.env.BF_REDIS_PASSWORD}}"
+        {{ end }}
+        image: {{ .Values.botflow.image }}:{{ .Values.botflow.tag  }}
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.botflow.resources $.Values.botflow.sizing ) }}
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+        name: {{ .Values.global.project_name }}-botflow
+        ports:
+        - containerPort: {{ int .Values.botflow.containerPort }}
+        volumeMounts:
+        - name: {{ .Values.global.project_name }}-botflow-conf
+          mountPath: /opt/nova.botflow/config/
+        {{ if eq .Values.global.datastore.botflow.is_set "true" }}
+        - name: {{ .Values.global.project_name }}-botflow-userdata
+          mountPath: /opt/nova.botflow/userdata
+          subPath: userdata
+        {{ end }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.global.project_name }}-botflow-conf
+        configMap:
+          {{ if eq .Values.env.BF_MULTINODE_SYNC "true" }}
+          name: {{ .Values.global.project_name }}-botflow-sync-config
+          {{ else }}
+          name: {{ .Values.global.project_name }}-botflow-config
+          {{ end }}
+      {{ if eq .Values.global.datastore.botflow.is_set "true" }}
+      - name: {{ .Values.global.project_name }}-botflow-userdata
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.project_name }}-botflow-pvc
+      {{ end }}
+status: {}

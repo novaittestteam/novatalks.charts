@@ -1,0 +1,64 @@
+{{ if or (eq .Values.postgres.cnpgCluster "false") (eq .Values.postgres.cnpgMigration "true") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.project_name }}-postgres
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+spec:
+  replicas: {{ int .Values.postgres.replica }}
+  selector:
+    matchLabels:
+      app: {{ .Values.global.project_name }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.project_name }}-postgres
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "kubernetes.io/hostname"
+                  operator: In
+                  values: 
+                  {{- include "getNodes" ( list $.Values.global.nodeBind ) }}
+      containers:
+      - name: {{ .Values.global.project_name }}-postgres
+        image: {{ .Values.postgres.image }}
+        imagePullPolicy: "IfNotPresent"
+        {{ if eq .Values.postgres.sizing "large" }}
+        args: ["-c","max_connections=300","-c","shared_buffers=256MB","-c","effective_cache_size=768MB","-c","maintenance_work_mem=64MB","-c","checkpoint_completion_target=0.9","-c","wal_buffers=7864kB","-c","default_statistics_target=100","-c","random_page_cost=1.1","-c","effective_io_concurrency=200","-c","min_wal_size=2GB","-c","max_wal_size=8GB"]
+        {{ end }}
+        ports:
+          - containerPort: 5432
+        resources:
+          limits:
+          {{- include "getSizingResources" ( list $.Values.postgres.resources $.Values.postgres.sizing ) }}
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        env:
+          - name: POSTGRES_DB
+            value: {{ .Values.global.db_name }}
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.project_name }}-postgres-secret
+                key: "password"
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.project_name }}-postgres-secret
+                key: "username"
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: {{ .Values.global.project_name }}-postgresdb
+            subPath: ./db/postgres
+      volumes:
+        - name: {{ .Values.global.project_name }}-postgresdb
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.project_name }}-postgres-pvc
+{{ end }}

@@ -1,0 +1,299 @@
+# Default values for NovaTalks
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Overrides the image tag whose default is the chart appVersion.
+
+global:
+  #Must be changed in all config below, like a db-host, redis-host
+  project_name: ntk-dev-novaitxx
+  #Namespace
+  customer_name: dev-novaitxx
+  #DB Connection settings
+  db_host: &db_host ntk-dev-novait-postgres
+  #db_host: &db_host ntk-dev-novait-postgres-cluster-rw #In case of CloudNativePG
+  db_name: &db_name ntk-dev-novait-novatalks
+  db_user: &db_user ntk-dev-novait-novatalks-svc
+  redis_host: &redis_host ntk-dev-novait-redis
+  redis_port: &redis_port 6379
+  customer_fqdn: "novait.k3s.dev.novait.com.ua"
+  customer_fqdn_int: "novait.k3s.dev.novait.local"
+  additionalBotflowRoutes:
+    route1:
+      baseUrl: novait.k3s.dev.novait.com.ua
+      pathPrefix: /redbot/messenger/test/channel-messenger/1
+      priority: 100
+    # route2:
+    #   baseUrl: novait.k3s.dev.novait.com.ua
+    #   pathPrefix: /redbot
+    #   priority: 100   
+
+
+  #Storage Settings
+  datastore:
+    static:           #Content Sharing PVC
+      is_set: "true" #Simple Local-Path PVC. Uses an old PVC "*-static-pvc". For Engine files
+      type: longhorn
+      size: 5Gi
+    postgres:
+      is_set: "true"
+      type: longhorn
+      size: 5Gi
+      access: ReadWriteOnce
+    postgresCluster:  #Will be created automatically when cnpgCluster is "true", BUT don't create any PVC/PV (they wil be created dynamically)
+      type: longhorn-strict
+      size: 5Gi
+      access: ReadWriteOnce
+    redis:
+      is_set: "true"
+      type: longhorn
+      size: 64Mi
+      access: ReadWriteOnce
+    botflow:
+      is_set: "false"
+      type: longhorn
+      size: 512Mi
+      access: ReadWriteOnce
+
+  #Helm installation will  compare only the values (nodes) and their qty. As matched nodes exists as that qty will be in affinty.
+  
+  nodeBind:
+    prefered: dev-01-k3sa01d.dev.novait.local
+    #alter: dev-01-k3sa02d.dev.novait.local
+  nodeBindPostgresCluster:
+    prefered: dev-01-k3sa01d.dev.novait.local
+    alter: dev-01-k3sa02d.dev.novait.local
+
+ui:
+  replica: 1
+  image: ghcr.io/novaitdevteam/novatalks.ui
+  tag: 2023_R3_master_d613e0b1
+  containerPort: 8000
+  servicePort: 8000
+  sizing: small
+  resources:
+    small:
+      cpu: 25m
+      memory: 128Mi
+    medium:
+      cpu: 30m
+      memory: 128Mi
+    large:
+      cpu: 50m
+      memory: 128Mi
+engine:
+  replica: 1
+  image: ghcr.io/novaitdevteam/novatalks.engine
+  tag: 2023_R3_master_63ac256b
+  containerPort: 3000
+  servicePort: 3000
+  sizing: small
+  resources:
+    small:
+      cpu: 250m
+      memory: 512Mi
+    medium:
+      cpu: 500m
+      memory: 1024Mi
+    large:
+      cpu: 1000m #better 1200m related to case NC2-564
+      memory: 2048Mi
+botflow:
+  replica: 1
+  image: ghcr.io/novaitdevteam/nova.botflow
+  tag: 2023_R3_master_6b8ac7cf
+  containerPort: 1880
+  servicePort: 1880
+  sizing: small
+  resources:
+    small:
+      cpu: 75m
+      memory: 384Mi
+    medium:
+      cpu: 120m
+      memory: 512Mi
+    large:
+      cpu: 300m
+      memory: 768Mi
+postgres:
+  replica: 1
+  sizing: small
+  image: postgres:15.3
+  jobBackupEnabled: "true"
+  jobBackupSchedule: "30 4 * * *"
+  jobReindexEnabled: "true"
+  jobReindexSchedule: "30 5 * * *"
+  jobToS3: "true" # Addition container for S3 upload
+  resources:
+    small:
+      cpu: 150m
+      memory: 512Mi
+    medium:
+      cpu: 300m
+      memory: 1256Mi
+    large:
+      cpu: 650m
+      memory: 2048Mi
+  cnpgCluster: "true"
+  cnpgMigration: "false" #Only for initial data migration in deployed installations. It turns on simple Postgres and CNPG Cluster.
+  cnpgClusterImage: ghcr.io/cloudnative-pg/postgresql:15.3
+  cnpgClusterReplica: 1
+  cnpgClusterBackupPath: "s3://dev-01-dev-longhorn-backup-bucket/"
+  #cnpgClusterBackupPath: "s3://ntk-prod-db-backup-bucket/" #for Prod
+  cnpgClusterParameters: #Small Configuration, must be tuned according to sizing
+    max_connections: 50
+    shared_buffers: 128MB
+    effective_cache_size: 384MB
+    maintenance_work_mem: 32MB
+    checkpoint_completion_target: 0.9
+    wal_buffers: 3932kB
+    default_statistics_target: 100
+    random_page_cost: 1.1
+    effective_io_concurrency: 200
+    min_wal_size: 1GB
+    max_wal_size: 2GB
+    work_mem: 1310kB
+    pg_stat_statements.max: 10000
+    pg_stat_statements.track: all
+    auto_explain.log_min_duration: 10s
+    archive_timeout: 300 #in sec for WAL shipping      
+redis:
+  replica: 1
+  sizing: small
+  resources:
+    small:
+      cpu: 20m
+      memory: 96Mi
+    medium:
+      cpu: 30m
+      memory: 96Mi
+    large:
+      cpu: 50m
+      memory: 128Mi
+
+#Auth
+#All Sealed secrets are namespaced
+secrets:
+  botflow:
+    user: 
+      username: "presales@novait.com.ua"
+      password: "$2b$08$2FaplJ0bd5pbrmLJL4AiMuCg8Io2.IIJF8vr3F08/hDyFsK2rWbGO"
+    admin:
+      username: "support@novatalks.ai"
+      password: "$2b$08$XjFM1OcVwo4xh4FrRe379eC77Li25MEOkoFMj0SQOu4VoPhcSaLFm"  
+  db:
+    #Test Simple User/Pass
+    user: AgDI4yXbyhZYGbO30kBjpk0ncztnY06URKsTjx33SWMA88gf1wvn8bGovUmqUpVnXgL1mJrkKGsoUkGNFxUC6KnKkgD6bU5W9okaQ51vZHadZ3sZV0lk2QbFrZoc0FN6ZC6TjejQjIWuLLdxobzEmQim8leeeXf8XltfHRcnU7KB4wLIj8am/Mxjlecm1mPoebh4JCEhKFVCzAnXY7fCf3LVXG3OibI9F7Ea1tyHwZmUuP2Q+7hh5oBi4rBEklJP7RSDLDsLIqUvMHuaJxh2XBnd2cqpV+VcbQ4NmVDTO7U6odGkVVu3AHTDDmw+cAR71XusKPJY1YRNtleEJYN49y6yXhI3sgoSOE2eyTS9gC6QievIvT9Kwo3KnTRMjcM82b0A59kE0e9wp/+8tATu1oPfxze/VRYhV3WvwqHRzJjQdaALhVr9QkkduXCB7D2OnSloE0VzrkUempTdiM/O6O6hyH5oqpsDJOR7jLrZRsZMTG8aJF6uMq/goX1AqYgW/Wb1gyDasaSZxGOod9bzKUE/h2EFSaKo4rIwnNGJa6RG/JqTOf163bdKdvVjfSwJOYbQ+HQsjQVpUnybDDhEmEJmLydboQdFFSrRqs0omcQHAaqZpKoq9RTwtTjs2MAfual/c6wsaZZXCi0i+E4bWgZNDP0vpycZ+CoWD1bnrAea5vttq/aSqWs4JQrjgivJ4YqRS0sWXkzZf5T7ixwuAX8p16OhwXEDs32oy8Ks
+    pass: AgCtVCN9nmu891CvtMOFTz2rb21NHHI1obK9SoDYXciyJex8Hl+ZjdcHdHq5xJHEnE3Y8OiI2r8d6PCnK8mrh+t+rTHGD3H1fxDVUVLXAogf90dpFEKbITUtu/lPCP9SuBnse5yFVBB8vmqj/wPNSueMWkSv1tIbbmF4uOQ1qsYbhkWSZ0xqW/HnEYrFbN3AOT+ATNdClkoF56sXQPLYdx6nKKIhha5LKmdI48qs4JK/6HOiea1w5Yf/PGg7NCedRS6Ryd6rSe0PX6Dc5t/Fth8p5QBZ8eTerG2b/jnQPqvB+9ykBs0ZJwYYs7sCiHCyLc9k4uIG+lO47dymsN56UxsN2u2qJLNDLCCFquvkgrVuXlTQW9NBVr7/6VKOeDXl01jsCbx2ZSjyW9HrwcZMSQsoTzkFzDXR8+/FvS0L5JZJOvrID3AOuPATP1uRmI/RZwuokAG2Pn8NrUfprBKGHWrn6A0ZOs9lbSKXptYdvaAGMCo3aeZLxi7bc0PEjRQAiiKNeMHB5MBeAfIRHT15+hBDQ1YUSrSQY+FVTkNn8S3wVfN6HfXlg9LQOLdQcwJeiLbSmxaKqXdlEoFOhbEBWfklHGM1z0tb5esL33jT1LHyxdL/RoemclFYp1rYo7iTOCwdSxlz3xekDPOYa+Ac4U4qUiXiFyLncndLEcLPtiUHNDb/+Zov6XKL+Vxb+CPS1WwPFy6+W4UCdw==
+  redis:
+    #Empty pass --scope cluster-wide only for redis
+    pass: AgAyVO620q6zfIgGelpSe/6NKIqVz6GnqPSFpUaXFKXdEOTje8g2fQ82PMO17TT77MwDp4qk+XiULkOwC4Yopt52F+kMrP1kmXPzsb1BMyoJ0qPzSyPcoIjk2bG+/CFCgkn4d1LLyDz0jlYe6jAhB0XdQK+ZIBuVQXZIS7H8BAZEvtoTTaXdPPJo/7B+h/K087Rpl/eiJrGhRyXfvye6g9NjqTWF+p9KXhZhY2TE39krwhE5WyadzgoB/tC9b49Yak9iEZy63T4u11hOY+F517mMPNxoAscY0jBU6wAaUz87inNn4ym9Mp1Fr6FfRI8iDWcoM8aggX0all6EnoFZXkTzZg32n9Q1Bdrl608mbtToR+SYX2dasqy7rT7zQT6GMkehF5Hijk45eSrDyn9cCbJt3OkB0M02VI8KcPDHBFNdLuFmw0G7KwFuj/o8oHBXvSshwyxkSw/EPTXOWsWhcJK+oDN3hfnZJzzttuevs/oOcrcIIruvijPi03eHHpnbbqskYgpRnlvnYKTnFGVC1Lb/++FVgXk5VujqhGkFdjUBNPmV+rsVM9yMUma3aXMmQd50lFElF3HdkKbXeh++XVhjfpLWqwolfhACfGQhWDMR3V2q8/dwxGUkS8MmqEhopwFByYIT896pv+PNk85d5L28PQTJeRujOTnLQKJ12owaHnns/Gftyvw6OtwF1+y6V7A=
+  objectStorage:
+    #Dev Bucket MiniO
+    AccessKeyID: AgC9ioYDRPoWHcW5ivU20IHSfKGLArxylW8F9tC5ZVg8jXRbbGHo38DCXmsK9hSBSCQrNAsOadtEJ2DtAPJ56o4Mc1LKH9bRlwpwZ8BplxmLA42OJoB4ioADCzIIq03u4IImHl9JqjSMJwvhYUAnFOUcuq9WpKNts8fodrzmA7Q/FWHrez/dnnunJV+imVjgUZwGHR7QwP1/4I0FHDnxTknngcjDbDtI/ClMI9EDz/VAndF33KqTVul0AGRxcqGbG2TCfdB4xtg22WgT9pTQreDd/tov7RvkD5Vy3GyptI1Dqm7ZiJ3eg8dfOxyMrMzhVNM/xp3VE+i/C545+P0l8EQnL3PIea9PtEZ+mKcItpvclZHUCbjyKjuOPQcjRKgssCGf9w3aplnLtLGDZOvkgbOu7FCqP+jUtrUvUpiiOCoM1TXzjqNkRbl/UIIzJEQS9Yfd0uGWQLnMoOteIN0jQ5PaBJustUQAqW3PdGjdfhEN1hXaARutiYV6F/Ca94W02Z5V+7j1bP29MtszmBxdN4EhQN7JuMMVFgUSw0/2fbQ35xbUkY3lHdY/qkHcs8qRlZVV/LYZpEO6V0akICDC08a0CvpKXyus4Es+JCS4/gPkPziSFUhGmdz/wQbhFjjaHZdsR5EB3itnt8f8jO0MOIPudAWL2FVgh1I/Mbfot9DW25HUrG0BzXJvH4eXPhKby2taxUHyH5U3prphOeiFDgY4+WeP
+    #Dev Key MiniO
+    AccessKey: AgAV+XnlwDfjYLHXVT7Vx3KaIkIG9ez/NiGr8dH7yNBty8ko500Y9cV4mLb1NlE90tQyxypvH/XogZ2E6sC4AwDZc3kXq2Is3xtqSkNHLN/txSMg6rU3JVhdIjYO5Ze7RfB3/878KeAzTez/fI9g792+mMlWe/B9YQM2/I9AW4kWahtSyzCpu1x/Gn6zqyj4+xefiTpENnp2IbAzeO5Vnax5h7PlLOWLeso3aWo1kSTJxePgGujSUkYMgu3+vt/TBlsP9jfmi6hVZwWKyXdOHVUp5Y+0z88YMVF0XckpMj77ib4Biqmjtl6rx3puqhvbpIUfEwdRSlvyVNdnHGP7ZIt2pZfris6oY9Awo+mXvQycis7ixuT2sO8hX+RTm1JjcgcjY1oNG51nMLKFZOe82tvybAEFQjCAfgXpHenyB//8I7K+oPQ9DUxOf1BAD4BVqQnTmMiHDmZbaUkPtLRs4TJ90jxxUezanQDWMpMQbyVDKMqlDN+ZMMN/hykFnTX/c6ll3wiqcGPXRfDl+YIfKvi22iTwD2P6fyXotquI66TYMs+Pnqxbtd6FZ7jLomkK5D8UNmCy73Vq3R6JcNBkQ7NpkBCMMaZjRToooTuuX28YFP4ek0+R68pNd7Z2fOyV3c8EyZbQMnxOBzAj6h3LgUMoWxNF6WABMvUgJl3uhF46nHyQj6K6ClcXNS/vUU/DroCOAX0UPNTtZlR4GIIFCUTbrvKjRIP8t7YslGUTHgfavA==
+ 
+env:
+
+  ################NOVA BOTFLOW################
+
+  BF_NODE_RED_CREDENTIAL_SECRET: "N0v@ITLLC"
+  BF_MESSAGE_ID_PREFIX: "ntid"
+  BF_MESSAGE_ID_EX_TIME: "604800"
+
+  #Scaling configuration
+  BF_MULTINODE_SYNC: "true"
+  BF_CONFIG_STORAGE_TYPE: "redis" #redis, filesystem by default
+  BF_REDIS_HOST: *redis_host
+  BF_REDIS_PORT: *redis_port
+  BF_REDIS_DB: 15
+  #BF_REDIS_PASSWORD: ""
+
+  ################NOVATALKS UI################
+  
+  UI_SERVER_PORT: "8000"
+  UI_SERVER_HOST: "0.0.0.0"
+
+  UI_NOVA_CHATS_ENGINE_HOST: "http://ntk-dev-novait-engine:3000"
+  UI_IMPORT_CONTACTS: "true"
+  UI_DELETE_CONTACT: "false"
+  UI_WEBSOCKET_URL: "https://novait.k3s.dev.novait.com.ua"
+  UI_PRESENCE_INTERVAL: "10000"
+  UI_REFRESH_REPORT_INTERVAL: "30000"
+  UI_MESSAGE_DYNAMIC_TIME: "true"
+  UI_VAPID_PUBLIC_KEY: "BIcMy5toEHOHrf86mFrGFCq-jC8WjX4KHZ0En4OTSb-oCiySUxI_VlT9pYqJrY_c7Ia-LPeoDTYOpnLDdYFQaNQ"
+  UI_VUE_PRODUCTION_TIP: "false"
+  UI_VUE_DEVTOOLS: "false"
+  UI_PINNED_MESSAGES_LIMIT: "150"
+  UI_CONVERSATION_LIST_LIMIT: "50"
+  
+  UI_NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
+  ################NOVATALKS ENGINE################
+  ENGINE_UV_THREADPOOL_SIZE: "32"
+
+  # APPLICATION CONFIG
+  ENGINE_NODE_ENV: "production" 
+  ENGINE_APP_HOST: "0.0.0.0"
+  ENGINE_APP_PORT: "3000"
+  ENGINE_FRONTEND_URL: "https://novait.k3s.dev.novait.com.ua" #User's notifications Base URL
+  ENGINE_WIDGET_URL: "https://storage.novatalks.ai/static/widget/v1"
+  ENGINE_STORE_URL: "https://novait.k3s.dev.novait.com.ua" #Get Attachement and Avatars from Core
+  ENGINE_SWAGGER_STATS_ENABLE: "false"
+  ENGINE_LOG_LEVEL: "info"
+  ENGINE_THROTTLE_ENABLE: "true"
+  #the ttl, the time to live in seconds for the request tracker, and the limit, or how many times an endpoint can be hit before returning a 429
+  ENGINE_THROTTLE_TTL: "60"
+  ENGINE_THROTTLE_LIMIT: "100"
+  ENGINE_AUTH_LOGOUT_TIMEOUT: "30000"
+  ENGINE_AUTH_AGENT_INACTIVE_TIMEOUT: "60000"
+  #File extensions that are ALLOWED for Transferring
+  #Most complete extesions list: .aac,.amr,.bmp,.cdr,.csv,.doc,.DOC,.docx,.gif,.heic,.HEIC,.html,.ini,.jfif,.jks,.jpeg,.jpg,.m4a,.mht,.mkv,.mov,.mp3,.mp4,.MP4,.msg,.oga,.pdf,.PDF,.png,.PNG,.pptx,.rar,.rtf,.txt,.vptt,.webm,.webp,.xls,.xlsx,.XLSX,.xml,.zip
+  ENGINE_FILE_SUPPORTED_FILE_EXTENSIONS: ".oga,.MP4,.aac,.bmp,.csv,.doc,.docx,.gif,.ico,.jpeg,.jpg,.json,.k3s,.mp4,.ogg,.pdf,.png,.pptx,.rar,.rtf,.svg,.txt,.webm,.wmv,.xml,.zip"
+  ENGINE_MESSAGE_STATUS_INTERVAL: "5000"
+  ENGINE_HISTORY_REPORT_ROWS: "5000"
+
+  # DATABASE CONFIG
+  ENGINE_DATABASE_DIALECT: "postgres"
+  ENGINE_DATABASE_HOST: *db_host
+  ENGINE_DATABASE_PORT: "5432"
+  ENGINE_DATABASE_USERNAME: *db_user
+  ENGINE_DATABASE_NAME: *db_name
+
+  # REDIS CONFIG
+  ENGINE_REDIS_HOST: *redis_host
+  ENGINE_REDIS_PORT: *redis_port
+  ENGINE_REDIS_DB: "0"
+
+  # MAIL CONFIG
+  ENGINE_ENCRYPTION_SECRET: "" #less than 38 symbols
+  ENGINE_EMAIL_FETCH_INTERVAL: "30000"
+  ENGINE_MAIL_HOST: "maildev"
+  ENGINE_MAIL_PORT: "1025"
+  ENGINE_MAIL_USER: ""
+  ENGINE_MAIL_PASSWORD: ""
+  ENGINE_MAIL_IGNORE_TLS: "true"
+  ENGINE_MAIL_SECURE: "false"
+  ENGINE_MAIL_REQUIRE_TLS: "false"
+  ENGINE_MAIL_DEFAULT_EMAIL: "noreply@example.com"
+  ENGINE_MAIL_DEFAULT_NAME: "Api"
+  ENGINE_MAIL_CLIENT_PORT: "1080"
+
+  ENGINE_AUTH_ACTIVE_PROVIDERS: "email"
+  ENGINE_AUTH_JWT_SECRET: "nLxbUR3v5932CJz9"
+  ENGINE_AUTH_JWT_TOKEN_EXPIRES_IN: "7d"
+  ENGINE_PASSPORT_USERNAME_FIELD: ""
+  ENGINE_PASSPORT_PASSWORD_FIELD: ""
+
+
+  # LDAP CONFIG
+  ENGINE_LDAP_URL: ""
+  ENGINE_LDAP_BIND_DN: ""
+  ENGINE_LDAP_BIND_CREDENTIALS: ""
+  ENGINE_LDAP_SEARCH_BASE: ""
+  ENGINE_LDAP_SEARCH_FILTER: ""
+  ENGINE_LDAP_SEARCH_ATTRIBUTES: ""
+  ENGINE_LDAP_CA_CERTIFICATE: ""
+  ENGINE_LDAP_IGNORE_CERTIFICATE: "true"
+
+  ################NOVA BOTFLOW################

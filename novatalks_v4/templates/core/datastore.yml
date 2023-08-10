@@ -1,0 +1,218 @@
+{{ if eq .Values.global.datastore.static.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-static-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-static
+    type: {{ .Values.global.datastore.static.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.static.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.static.type }}
+  {{ if eq .Values.global.datastore.static.type "local-path" }} 
+  volumeName: {{ .Values.global.project_name }}-pv-static
+  {{ end }}
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.static.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.static.type "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-static
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-static
+    type: {{ .Values.global.datastore.static.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.static.size }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/ntk-static/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}
+
+---
+
+{{ if eq .Values.global.datastore.postgres.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-postgres-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+    type: {{ .Values.global.datastore.postgres.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.postgres.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.postgres.type }}
+  {{ if eq .Values.global.datastore.postgres.type "local-path" }}
+  volumeName: {{ .Values.global.project_name }}-pv-postgres
+  {{ end }}
+  accessModes:
+  - {{ .Values.global.datastore.postgres.access }}
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.postgres.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.postgres.type "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-postgres
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-postgres
+    type: {{ .Values.global.datastore.postgres.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.postgres.size }}
+  accessModes:
+    - {{ .Values.global.datastore.postgres.access }}
+  hostPath:
+    path: "/mnt/ntk-postgres/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}
+
+---
+
+{{ if eq .Values.global.datastore.redis.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-redis-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-redis
+    type: {{ .Values.global.datastore.redis.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.redis.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.redis.type }}
+  {{ if eq .Values.global.datastore.redis.type "local-path" }}
+  volumeName: {{ .Values.global.project_name }}-pv-redis
+  {{ end }}
+  accessModes:
+  - {{ .Values.global.datastore.redis.access }}
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.redis.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.redis.type "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-redis
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-redis
+    type: {{ .Values.global.datastore.redis.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.redis.size }}
+  accessModes:
+    - {{ .Values.global.datastore.redis.access }}
+  hostPath:
+    path: "/mnt/ntk-redis/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}
+
+
+---
+
+{{ if eq .Values.global.datastore.botflow.is_set "true" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.project_name }}-botflow-pvc
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+    type: {{ .Values.global.datastore.botflow.type }}
+    cost: medium
+{{ if eq .Values.global.datastore.botflow.type "longhorn" }}
+  annotations:
+    "helm.sh/resource-policy": keep
+{{ end }}
+spec:
+  storageClassName: {{ .Values.global.datastore.botflow.type }}
+  {{ if eq .Values.global.datastore.botflow.type "local-path" }}
+  volumeName: {{ .Values.global.project_name }}-pv-botflow
+  {{ end }}
+  accessModes:
+  - {{ .Values.global.datastore.botflow.access }}
+  resources:
+    requests:
+      storage: {{ .Values.global.datastore.botflow.size }}
+status: {}
+
+{{ if eq .Values.global.datastore.botflow.type "local-path" }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.project_name }}-pv-botflow
+  namespace: {{ .Values.global.customer_name }}
+  labels:
+    app: {{ .Values.global.project_name }}-botflow
+    type: {{ .Values.global.datastore.botflow.type }}
+    cost: medium
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: {{ .Values.global.datastore.botflow.size }}
+  accessModes:
+    - {{ .Values.global.datastore.botflow.access }}
+  hostPath:
+    path: "/mnt/ntk-botflow/{{ .Values.global.customer_name }}/"
+    type: DirectoryOrCreate
+
+{{ end }}
+{{ end }}
