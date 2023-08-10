@@ -9,12 +9,6 @@ global:
   #Namespace
   customer_name: dev-novaitxx
   #DB Connection settings
-  db_host: &db_host ntk-dev-novait-postgres
-  #db_host: &db_host ntk-dev-novait-postgres-cluster-rw #In case of CloudNativePG
-  db_name: &db_name ntk-dev-novait-novatalks
-  db_user: &db_user ntk-dev-novait-novatalks-svc
-  redis_host: &redis_host ntk-dev-novait-redis
-  redis_port: &redis_port 6379
   customer_fqdn: "novait.k3s.dev.novait.com.ua"
   customer_fqdn_int: "novait.k3s.dev.novait.local"
   additionalBotflowRoutes:
@@ -204,9 +198,9 @@ env:
   #Scaling configuration
   BF_MULTINODE_SYNC: "true"
   BF_CONFIG_STORAGE_TYPE: "redis" #redis, filesystem by default
-  BF_REDIS_HOST: *redis_host
-  BF_REDIS_PORT: *redis_port
-  BF_REDIS_DB: 15
+  # BF_REDIS_HOST: ntk-dev-novait-redis
+  # BF_REDIS_PORT: 6379
+  # BF_REDIS_DB: 15
   #BF_REDIS_PASSWORD: ""
 
   ################NOVATALKS UI################
@@ -255,15 +249,16 @@ env:
 
   # DATABASE CONFIG
   ENGINE_DATABASE_DIALECT: "postgres"
-  ENGINE_DATABASE_HOST: *db_host
-  ENGINE_DATABASE_PORT: "5432"
-  ENGINE_DATABASE_USERNAME: *db_user
-  ENGINE_DATABASE_NAME: *db_name
+  # ENGINE_DATABASE_HOST: ntk-dev-novait-postgres
+  # ENGINE_DATABASE_HOST: ntk-dev-novait-postgres-cluster-rw  #In case of CloudNativePG
+  # ENGINE_DATABASE_PORT: "5432"
+  # ENGINE_DATABASE_USERNAME: ntk-dev-novait-novatalks-svc
+  # ENGINE_DATABASE_NAME: ntk-dev-novait-novatalks
 
   # REDIS CONFIG
-  ENGINE_REDIS_HOST: *redis_host
-  ENGINE_REDIS_PORT: *redis_port
-  ENGINE_REDIS_DB: "0"
+  # ENGINE_REDIS_HOST: ntk-dev-novait-redis
+  # ENGINE_REDIS_PORT: 6379
+  # ENGINE_REDIS_DB: "0"
 
   # MAIL CONFIG
   ENGINE_ENCRYPTION_SECRET: "" #less than 38 symbols

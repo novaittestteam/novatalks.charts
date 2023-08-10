@@ -73,11 +73,11 @@ spec:
         - name: BF_CONFIG_STORAGE_TYPE
           value: "{{ .Values.env.BF_CONFIG_STORAGE_TYPE}}"
         - name: BF_REDIS_HOST
-          value: "{{ .Values.env.BF_REDIS_HOST}}"
+          value: "{{ .Values.env.BF_REDIS_HOST | default (printf "%s-redis" .Values.global.project_name) }}"
         - name: BF_REDIS_PORT
-          value: "{{ .Values.env.BF_REDIS_PORT}}"
+          value: "{{ .Values.env.BF_REDIS_PORT | default 6379 }}"
         - name: BF_REDIS_DB
-          value: "{{ .Values.env.BF_REDIS_DB}}"
+          value: "{{ .Values.env.BF_REDIS_DB | default 15 }}"
         #- name: BF_REDIS_PASSWORD
         #  value: "{{ .Values.env.BF_REDIS_PASSWORD}}"
         {{ end }}

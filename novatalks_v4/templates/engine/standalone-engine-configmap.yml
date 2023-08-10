@@ -25,13 +25,16 @@ data:
   AUTH_LOGOUT_TIMEOUT: "{{ .Values.env.ENGINE_AUTH_LOGOUT_TIMEOUT }}"
   AUTH_AGENT_INACTIVE_TIMEOUT: "{{ .Values.env.ENGINE_AUTH_AGENT_INACTIVE_TIMEOUT }}"
   DATABASE_DIALECT: "{{ .Values.env.ENGINE_DATABASE_DIALECT }}"
-  DATABASE_HOST: "{{ .Values.env.ENGINE_DATABASE_HOST }}"
-  DATABASE_PORT: "{{ .Values.env.ENGINE_DATABASE_PORT }}"
-  DATABASE_USERNAME: "{{ .Values.env.ENGINE_DATABASE_USERNAME }}"
-  DATABASE_NAME: "{{ .Values.env.ENGINE_DATABASE_NAME }}"
-  REDIS_HOST: "{{ .Values.env.ENGINE_REDIS_HOST }}"
-  REDIS_PORT: "{{ .Values.env.ENGINE_REDIS_PORT }}"
-  REDIS_DB: "{{ .Values.env.ENGINE_REDIS_DB }}"
+  {{ if eq .Values.postgres.cnpgCluster "true" }}
+  DATABASE_HOST: "{{ .Values.env.ENGINE_DATABASE_HOST | default (printf "%s-postgres-cluster-rw" .Values.global.project_name) }}"
+  {{ else }}
+  DATABASE_HOST: "{{ .Values.env.ENGINE_DATABASE_HOST | default (printf "%s-postgres" .Values.global.project_name) }}"
+  {{ end }}
+  DATABASE_PORT: "{{ .Values.env.ENGINE_DATABASE_PORT | default 5432 }}"
+  DATABASE_NAME: "{{ .Values.env.ENGINE_DATABASE_NAME | default (printf "%s-novatalks" .Values.global.project_name) }}"
+  REDIS_HOST: "{{ .Values.env.ENGINE_REDIS_HOST | default (printf "%s-redis" .Values.global.project_name) }}"
+  REDIS_PORT: "{{ .Values.env.ENGINE_REDIS_PORT | default 6379 }}"
+  REDIS_DB: "{{ .Values.env.ENGINE_REDIS_DB | default 0 }}"
   #ENCRYPTION_SECRET: "{{ .Values.env.ENGINE_ENCRYPTION_SECRET }}"
   ENCRYPTION_SECRET: {{ randAlphaNum 24 | quote }}
   EMAIL_FETCH_INTERVAL: "{{ .Values.env.ENGINE_EMAIL_FETCH_INTERVAL }}"
